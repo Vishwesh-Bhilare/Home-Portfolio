@@ -190,6 +190,52 @@ p {
   color: var(--text);
 }
 
+/* (everything above remains unchanged) */
+
+/* Projects */
+.projects {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  margin-top: 8px;
+}
+
+.project-card {
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px;
+  padding: 24px 26px;
+}
+
+.project-title {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.project-desc {
+  font-size: 15px;
+  line-height: 1.8;
+  margin-bottom: 14px;
+}
+
+.project-tech {
+  font-size: 13.5px;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+
+.project-links a {
+  font-size: 14px;
+  color: var(--muted);
+  text-decoration: none;
+  margin-right: 16px;
+  transition: color 0.2s ease;
+}
+
+.project-links a:hover {
+  color: var(--text);
+}
+
 @keyframes fade {
   from {
     opacity: 0;
