@@ -23,30 +23,22 @@ body {
   display: flex;
 }
 
-/* Background glow */
-/* Background glow */
+/* Ambient glow */
 .bg-glow {
   position: fixed;
   width: 820px;
   height: 820px;
-
-  /* Brighter + tighter core */
   background: radial-gradient(
     circle,
     rgba(255,255,255,0.12) 0%,
     rgba(255,255,255,0.08) 25%,
     rgba(255,255,255,0.0) 68%
   );
-
-  /* Slightly less blur = more presence */
   filter: blur(95px);
-
   pointer-events: none;
   z-index: 0;
 }
 
-
-/* Keep content above glow */
 body > *:not(.bg-glow) {
   position: relative;
   z-index: 1;
@@ -113,7 +105,6 @@ body > *:not(.bg-glow) {
 
 .section {
   display: none;
-  max-width: 720px;
   animation: fade 0.25s ease;
 }
 
@@ -121,16 +112,31 @@ body > *:not(.bg-glow) {
   display: block;
 }
 
+/* Width breathing */
+.section.wide {
+  max-width: 760px;
+}
+
+.section.narrow {
+  max-width: 640px;
+}
+
 /* Typography */
 .hero {
   font-size: 44px;
   font-weight: 500;
-  margin-bottom: 32px;
+  margin-bottom: 12px;
 }
 
 .section-title {
   font-size: 26px;
   font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.microcopy {
+  font-size: 14px;
+  color: var(--muted);
   margin-bottom: 24px;
 }
 
@@ -147,13 +153,19 @@ p {
   gap: 14px;
 }
 
+/* Divider rhythm */
 .divider {
-  width: 40px;
+  width: 32px;
   height: 2px;
   background: var(--text);
   margin: 32px 0;
 }
 
+.divider-wide {
+  width: 48px;
+}
+
+/* Contact */
 .contact {
   display: flex;
   flex-direction: column;
