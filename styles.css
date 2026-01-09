@@ -19,8 +19,10 @@ html, body {
   color: var(--text);
 }
 
+/* Body is a fixed frame */
 body {
   display: flex;
+  overflow: hidden;
 }
 
 /* Ambient glow */
@@ -59,25 +61,27 @@ body > *:not(.bg-glow) {
   height: 100vh;
 }
 
+/* Brand */
 .brand {
   font-size: 18px;
   font-weight: 500;
-  margin-bottom: 48px;
+  margin-bottom: 56px;
 }
 
+/* Navigation */
 .nav {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 28px; /* increased */
 }
 
 .tab {
   background: none;
   border: none;
   color: var(--muted);
-  font-size: 15.5px;
-  letter-spacing: 0.2px;
+  font-size: 17px; /* increased */
+  letter-spacing: 0.3px;
   text-align: left;
   cursor: pointer;
 }
@@ -90,7 +94,7 @@ body > *:not(.bg-glow) {
   position: absolute;
   left: -12px;
   width: 2px;
-  height: 18px;
+  height: 20px;
   background: var(--text);
   transition: top 0.3s ease;
 }
@@ -101,14 +105,18 @@ body > *:not(.bg-glow) {
   color: var(--muted);
 }
 
-/* Main */
+/* Main scroll area */
 .main {
   flex: 1;
+  height: 100vh;
   padding: 80px;
+  overflow-y: auto;
+
   display: flex;
   align-items: flex-start;
 }
 
+/* Sections */
 .section {
   display: none;
   animation: fade 0.25s ease;
@@ -129,13 +137,13 @@ body > *:not(.bg-glow) {
 }
 
 .section-title {
-  font-size: 26px;
+  font-size: 28px; /* slightly increased */
   font-weight: 500;
   margin-bottom: 8px;
 }
 
 .microcopy {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--muted);
   margin-bottom: 24px;
 }
@@ -154,11 +162,13 @@ p {
   color: inherit;
 }
 
+/* Lists */
 .list {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
+  font-size: 16px;
 }
 
 /* Divider */
@@ -172,47 +182,39 @@ p {
 .divider.shift-right { transform: translateX(6px); }
 .divider.shift-left { transform: translateX(-6px); }
 
-/* Projects grid
-.projects-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 28px;
-  margin-top: 12px;
-}
-*/
-
+/* Projects grid (single-column, wide) */
 .projects-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 32px;
+  gap: 36px;
   margin-top: 12px;
 }
 
 .project-card {
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 6px;
-  padding: 24px 26px;
+  padding: 28px 30px;
 
   display: flex;
   flex-direction: column;
 }
 
 .project-title {
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 500;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .project-desc {
-  font-size: 15px;
-  line-height: 1.75;
-  margin-bottom: 14px;
+  font-size: 15.5px;
+  line-height: 1.8;
+  margin-bottom: 16px;
 }
 
 .project-tech {
-  font-size: 13.5px;
+  font-size: 14px;
   color: var(--muted);
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .project-links {
@@ -221,7 +223,7 @@ p {
 
 .project-links a,
 .project-links span {
-  font-size: 14px;
+  font-size: 14.5px;
   color: var(--muted);
   text-decoration: none;
 }
@@ -234,12 +236,13 @@ p {
 .contact {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 }
 
 .contact a {
   color: var(--muted);
   text-decoration: none;
+  font-size: 16px;
   transition: color 0.2s ease;
 }
 
@@ -247,13 +250,7 @@ p {
   color: var(--text);
 }
 
-/* Responsive */
-@media (max-width: 900px) {
-  .projects-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
+/* Animations */
 @keyframes fade {
   from {
     opacity: 0;
