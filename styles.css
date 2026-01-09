@@ -64,14 +64,14 @@ body > *:not(.bg-glow) {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 24px; /* increased */
+  gap: 24px;
 }
 
 .tab {
   background: none;
   border: none;
   color: var(--muted);
-  font-size: 15.5px; /* increased */
+  font-size: 15.5px;
   letter-spacing: 0.2px;
   text-align: left;
   cursor: pointer;
@@ -85,7 +85,7 @@ body > *:not(.bg-glow) {
   position: absolute;
   left: -12px;
   width: 2px;
-  height: 18px; /* increased */
+  height: 18px;
   background: var(--text);
   transition: top 0.3s ease;
 }
@@ -113,7 +113,6 @@ body > *:not(.bg-glow) {
   display: block;
 }
 
-/* Width breathing */
 .section.wide { max-width: 760px; }
 .section.narrow { max-width: 640px; }
 
@@ -157,7 +156,7 @@ p {
   gap: 14px;
 }
 
-/* Divider rhythm + micro-shift */
+/* Divider */
 .divider {
   width: 32px;
   height: 2px;
@@ -165,12 +164,57 @@ p {
   margin: 32px 0;
 }
 
-.divider.shift-right {
-  transform: translateX(6px);
+.divider.shift-right { transform: translateX(6px); }
+.divider.shift-left { transform: translateX(-6px); }
+
+/* Projects grid */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 28px;
+  margin-top: 12px;
 }
 
-.divider.shift-left {
-  transform: translateX(-6px);
+.project-card {
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px;
+  padding: 24px 26px;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.project-title {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.project-desc {
+  font-size: 15px;
+  line-height: 1.75;
+  margin-bottom: 14px;
+}
+
+.project-tech {
+  font-size: 13.5px;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.project-links {
+  margin-top: auto;
+}
+
+.project-links a,
+.project-links span {
+  font-size: 14px;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.project-links a:hover {
+  color: var(--text);
 }
 
 /* Contact */
@@ -190,50 +234,11 @@ p {
   color: var(--text);
 }
 
-/* (everything above remains unchanged) */
-
-/* Projects */
-.projects {
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-  margin-top: 8px;
-}
-
-.project-card {
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 6px;
-  padding: 24px 26px;
-}
-
-.project-title {
-  font-size: 18px;
-  font-weight: 500;
-  margin-bottom: 10px;
-}
-
-.project-desc {
-  font-size: 15px;
-  line-height: 1.8;
-  margin-bottom: 14px;
-}
-
-.project-tech {
-  font-size: 13.5px;
-  color: var(--muted);
-  margin-bottom: 14px;
-}
-
-.project-links a {
-  font-size: 14px;
-  color: var(--muted);
-  text-decoration: none;
-  margin-right: 16px;
-  transition: color 0.2s ease;
-}
-
-.project-links a:hover {
-  color: var(--text);
+/* Responsive */
+@media (max-width: 900px) {
+  .projects-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @keyframes fade {
