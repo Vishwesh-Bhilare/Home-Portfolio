@@ -167,11 +167,19 @@ p {
 .divider.shift-right { transform: translateX(6px); }
 .divider.shift-left { transform: translateX(-6px); }
 
-/* Projects grid */
+/* Projects grid
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 28px;
+  margin-top: 12px;
+}
+*/
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
   margin-top: 12px;
 }
 
