@@ -23,6 +23,27 @@ body {
   display: flex;
 }
 
+/* Background glow */
+.bg-glow {
+  position: fixed;
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(
+    circle,
+    rgba(255,255,255,0.06) 0%,
+    rgba(255,255,255,0) 70%
+  );
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Keep content above glow */
+body > *:not(.bg-glow) {
+  position: relative;
+  z-index: 1;
+}
+
 /* Sidebar */
 .sidebar {
   width: 240px;
@@ -53,7 +74,6 @@ body {
   font-size: 14px;
   text-align: left;
   cursor: pointer;
-  padding: 4px 0;
 }
 
 .tab.active {
@@ -66,7 +86,7 @@ body {
   width: 2px;
   height: 16px;
   background: var(--text);
-  transition: top 0.25s ease;
+  transition: top 0.3s ease;
 }
 
 .footer {
@@ -117,7 +137,6 @@ p {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  font-size: 16px;
 }
 
 .divider {
@@ -127,11 +146,6 @@ p {
   margin: 32px 0;
 }
 
-.muted {
-  color: var(--muted);
-}
-
-/* Contact */
 .contact {
   display: flex;
   flex-direction: column;
@@ -141,7 +155,6 @@ p {
 .contact a {
   color: var(--muted);
   text-decoration: none;
-  font-size: 16px;
   transition: color 0.2s ease;
 }
 
@@ -149,7 +162,6 @@ p {
   color: var(--text);
 }
 
-/* Animations */
 @keyframes fade {
   from {
     opacity: 0;
