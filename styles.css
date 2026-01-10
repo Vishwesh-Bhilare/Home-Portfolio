@@ -250,6 +250,33 @@ p {
   color: var(--text);
 }
 
+/* === SKILLS GROUPING === */
+
+.skill-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.skill-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.skill-group-title {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.skill-group p {
+  font-size: 17px;
+  line-height: 1.8;
+}
+
 /* Animations */
 @keyframes fade {
   from {
