@@ -1,114 +1,802 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Vishwesh Bhilare</title>
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;1,14..32,300&display=swap" rel="stylesheet">
+  <style>
+    /* ─── TOKENS ─── */
+    [data-theme="dark"] {
+      --bg:       #0a0a0a;
+      --surface:  #111111;
+      --border:   rgba(255,255,255,0.07);
+      --text:     #f5f5f5;
+      --sub:      #888;
+      --muted:    #444;
+      --tag-bg:   #1a1a1a;
+      --blob:     rgba(255,255,255,0.13);
+      --blob2:    rgba(255,255,255,0.06);
+      --toggle-icon: "☀";
+    }
+    [data-theme="light"] {
+      --bg:       #fafafa;
+      --surface:  #ffffff;
+      --border:   rgba(0,0,0,0.08);
+      --text:     #0a0a0a;
+      --sub:      #666;
+      --muted:    #bbb;
+      --tag-bg:   #f0f0f0;
+      --blob:     rgba(0,0,0,0.06);
+      --blob2:    rgba(0,0,0,0.03);
+      --toggle-icon: "☾";
+    }
 
-  <link rel="stylesheet" href="styles.css" />
+    /* ─── RESET ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100%;
+      display: flex;
+      overflow: hidden;
+      transition: background 0.3s ease, color 0.3s ease;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── BLOB ─── */
+    .blob-wrap {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(110px);
+      will-change: transform;
+      animation: drift1 18s ease-in-out infinite alternate;
+    }
+    .blob-1 {
+      width: 600px; height: 600px;
+      top: -180px; left: -100px;
+      background: var(--blob);
+    }
+    .blob-2 {
+      width: 420px; height: 420px;
+      bottom: -80px; right: 10%;
+      background: var(--blob2);
+      animation: drift2 22s ease-in-out infinite alternate;
+    }
+    @keyframes drift1 {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(80px, 60px) scale(1.08); }
+    }
+    @keyframes drift2 {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(-60px, -80px) scale(1.05); }
+    }
+
+    /* ─── SIDEBAR ─── */
+    .sidebar {
+      position: relative;
+      z-index: 10;
+      width: 220px;
+      flex-shrink: 0;
+      height: 100vh;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 36px 24px;
+      background: var(--surface);
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+
+    .sidebar-name {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .sidebar-role {
+      font-size: 11px;
+      color: var(--sub);
+      font-weight: 400;
+      margin-bottom: 40px;
+    }
+
+    nav { display: flex; flex-direction: column; gap: 2px; }
+
+    .tab {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--sub);
+      cursor: pointer;
+      border: none;
+      background: none;
+      text-align: left;
+      width: 100%;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+    .tab:hover { background: var(--tag-bg); color: var(--text); }
+    .tab.active {
+      background: var(--tag-bg);
+      color: var(--text);
+      font-weight: 500;
+    }
+    .tab-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--muted);
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .tab.active .tab-dot { background: var(--text); }
+
+    .sidebar-bottom {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Theme toggle */
+    .toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: none;
+      color: var(--sub);
+      font-size: 11px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .toggle:hover { color: var(--text); background: var(--tag-bg); }
+    .toggle-icon { font-size: 13px; }
+
+    .sidebar-links {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .sidebar-link {
+      font-size: 11px;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 4px 12px;
+      transition: color 0.15s;
+    }
+    .sidebar-link:hover { color: var(--text); }
+
+    /* ─── MAIN ─── */
+    main {
+      flex: 1;
+      height: 100vh;
+      overflow-y: auto;
+      position: relative;
+      z-index: 5;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .panel {
+      display: none;
+      padding: 64px 64px 80px;
+      max-width: 780px;
+      animation: fadeUp 0.25s ease;
+    }
+    .panel.active { display: block; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── TYPOGRAPHY ─── */
+    .label {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    h1.title {
+      font-size: 38px;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+
+    h2.title {
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      color: var(--sub);
+      line-height: 1.7;
+      font-weight: 400;
+      max-width: 480px;
+      margin-bottom: 52px;
+    }
+
+    hr.sep {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 40px 0;
+    }
+
+    p.body {
+      font-size: 14px;
+      line-height: 1.8;
+      color: var(--sub);
+      max-width: 520px;
+    }
+    p.body strong { color: var(--text); font-weight: 500; }
+
+    /* ─── PROFILE: STAT ROW ─── */
+    .stat-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+    .stat {
+      flex: 1;
+      min-width: 140px;
+      padding: 20px 20px 18px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+    }
+    .stat-val {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+    .stat-key {
+      font-size: 11px;
+      color: var(--sub);
+      margin-top: 3px;
+    }
+
+    /* ─── HACKATHONS ─── */
+    .hack-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      margin-top: 40px;
+    }
+    .hack-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .hack-row:last-child { border-bottom: none; }
+    .hack-name { font-size: 13px; font-weight: 500; color: var(--text); }
+    .hack-org  { font-size: 12px; color: var(--sub); }
+    .hack-badge {
+      font-size: 11px;
+      padding: 3px 10px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      color: var(--sub);
+    }
+
+    /* ─── CERT ─── */
+    .cert {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      margin-top: 40px;
+      gap: 16px;
+    }
+    .cert-name { font-size: 13px; font-weight: 500; color: var(--text); }
+    .cert-id   { font-size: 11px; color: var(--sub); margin-top: 3px; font-variant-numeric: tabular-nums; }
+    .cert-chip {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 5px 10px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--sub);
+      white-space: nowrap;
+    }
+
+    /* ─── PROJECTS ─── */
+    .project-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .project {
+      padding: 28px 0;
+      border-bottom: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 1fr 60px;
+      gap: 24px;
+      align-items: start;
+    }
+    .project:first-child { padding-top: 0; }
+    .project:last-child  { border-bottom: none; }
+
+    .project-name {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .project-stack {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 10px;
+      font-variant-numeric: tabular-nums;
+    }
+    .project-desc {
+      font-size: 13px;
+      color: var(--sub);
+      line-height: 1.7;
+    }
+    .project-desc li { margin-left: 16px; margin-bottom: 2px; }
+    .project-year {
+      font-size: 11px;
+      color: var(--muted);
+      text-align: right;
+      padding-top: 3px;
+    }
+
+    /* ─── SKILLS ─── */
+    .skill-section {
+      margin-bottom: 32px;
+    }
+    .skill-section-title {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .tag {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--sub);
+      background: var(--tag-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 5px 10px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tag:hover { color: var(--text); border-color: var(--sub); }
+    .tag.hi { color: var(--text); font-weight: 500; }
+
+    /* ─── CONTACT ─── */
+    .contact-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .contact-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 0;
+      border-bottom: 1px solid var(--border);
+      text-decoration: none;
+      color: inherit;
+      transition: opacity 0.15s;
+    }
+    .contact-item:last-child { border-bottom: none; }
+    .contact-item:hover { opacity: 0.7; }
+    .contact-item-left { display: flex; align-items: center; gap: 16px; }
+    .contact-key {
+      font-size: 11px;
+      color: var(--muted);
+      width: 56px;
+      flex-shrink: 0;
+    }
+    .contact-val { font-size: 14px; font-weight: 500; color: var(--text); }
+    .contact-arrow { font-size: 14px; color: var(--muted); }
+
+    /* ─── EDU ─── */
+    .edu {
+      margin-top: 52px;
+    }
+    .edu-degree { font-size: 14px; font-weight: 600; color: var(--text); }
+    .edu-school  { font-size: 13px; color: var(--sub); margin-top: 4px; }
+    .edu-year    { font-size: 11px; color: var(--muted); margin-top: 6px; }
+
+    /* ─── SCROLLBAR ─── */
+    main::-webkit-scrollbar { width: 4px; }
+    main::-webkit-scrollbar-track { background: transparent; }
+    main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    /* ─── MOBILE ─── */
+    @media (max-width: 800px) {
+      body { flex-direction: column; overflow: auto; }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+        padding: 20px;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .sidebar-name, .sidebar-role { display: inline; margin: 0; }
+      .sidebar-role { display: none; }
+
+      nav {
+        flex-direction: row;
+        gap: 4px;
+      }
+
+      .sidebar-bottom {
+        margin-top: 0;
+        flex-direction: row;
+        margin-left: auto;
+        gap: 8px;
+      }
+      .sidebar-links { display: none; }
+
+      main { height: auto; overflow: visible; }
+      .panel { padding: 36px 20px 60px; max-width: 100%; }
+      h1.title { font-size: 28px; }
+      .stat-row { gap: 8px; }
+      .project { grid-template-columns: 1fr; }
+      .project-year { text-align: left; }
+    }
+  </style>
 </head>
 <body>
-  <div class="bg-glow" aria-hidden="true"></div>
 
-  <aside class="sidebar">
-    <div class="brand">Vishwesh Bhilare</div>
+<!-- BLOBS -->
+<div class="blob-wrap" aria-hidden="true">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+</div>
 
-    <nav class="nav">
-      <button class="tab active" data-target="profile">Profile</button>
-      <button class="tab" data-target="projects">Projects</button>
-      <button class="tab" data-target="skills">Skills</button>
-      <button class="tab" data-target="contact">Contact</button>
-      <span class="indicator"></span>
-    </nav>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div>
+    <div class="sidebar-name">Vishwesh Bhilare</div>
+    <div class="sidebar-role">Computer Engineering</div>
+  </div>
 
-    <div class="footer">© 2026</div>
-  </aside>
+  <nav>
+    <button class="tab active" data-panel="profile">
+      <span class="tab-dot"></span> Profile
+    </button>
+    <button class="tab" data-panel="projects">
+      <span class="tab-dot"></span> Projects
+    </button>
+    <button class="tab" data-panel="skills">
+      <span class="tab-dot"></span> Skills
+    </button>
+    <button class="tab" data-panel="contact">
+      <span class="tab-dot"></span> Contact
+    </button>
+  </nav>
 
-  <main class="main">
-    <!-- PROFILE -->
-    <section id="profile" class="section active wide">
-      <h1 class="hero">Vishwesh Bhilare</h1>
-      <p class="microcopy">
-        The best software does the least and does it well; simplicity isn’t a feature, it’s the point.
-      </p>
-      <div class="divider shift-right"></div>
-      <p>
-        I build things at the intersection of software, systems, and hardware.
-        My interests range from low-level programming and embedded systems to
-        frontend interfaces and <span class="tech">Flutter</span>-based apps.
-      </p>
-    </section>
+  <div class="sidebar-bottom">
+    <button class="toggle" id="themeToggle" aria-label="Toggle theme">
+      <span class="toggle-icon" id="toggleIcon">☀</span>
+      <span id="toggleLabel">Light</span>
+    </button>
+    <div class="sidebar-links">
+      <a class="sidebar-link" href="https://github.com/Vishwesh-Bhilare" target="_blank">GitHub ↗</a>
+      <a class="sidebar-link" href="https://www.linkedin.com/in/vishwesh-bhilare" target="_blank">LinkedIn ↗</a>
+    </div>
+  </div>
+</aside>
 
-    <!-- PROJECTS -->
-    <section id="projects" class="section wide">
-      <h2 class="section-title">Projects</h2>
-      <p class="microcopy">Selected things I’ve built</p>
-      <div class="divider shift-left"></div>
+<!-- MAIN -->
+<main>
 
-      <div class="projects-grid">
-        <!-- project cards unchanged -->
+  <!-- PROFILE -->
+  <div id="profile" class="panel active">
+    <div class="label">Profile</div>
+    <h1 class="title">Vishwesh Bhilare</h1>
+    <p class="subtitle">
+      Computer engineering undergrad at MMCOE, Pune. I build at the intersection of systems, software, and hardware — from embedded glove controllers to fully local AI pipelines.
+    </p>
+
+    <div class="stat-row">
+      <div class="stat">
+        <div class="stat-val">2028</div>
+        <div class="stat-key">Expected graduation</div>
       </div>
-    </section>
-
-    <!-- SKILLS (GROUPED) -->
-    <section id="skills" class="section narrow">
-      <h2 class="section-title">Skills</h2>
-      <p class="microcopy">Tools I’m comfortable with</p>
-      <div class="divider shift-right"></div>
-
-      <div class="skill-groups">
-        <div class="skill-group">
-          <h3 class="skill-group-title">Languages</h3>
-          <p>
-            <span class="tech">C</span>, <span class="tech">C++</span>, <span class="tech">Java</span>
-          </p>
-        </div>
-
-        <div class="skill-group">
-          <h3 class="skill-group-title">Frontend & Apps</h3>
-          <p>
-            <span class="tech">JavaScript</span>, HTML, CSS,
-            <span class="tech">Flutter</span>
-          </p>
-        </div>
-
-        <div class="skill-group">
-          <h3 class="skill-group-title">Systems & Embedded</h3>
-          <p>
-            Embedded Systems,
-            <span class="tech">ESP32</span>,
-            <span class="tech">Arduino</span>,
-            Sensor Integration
-          </p>
-        </div>
-
-        <div class="skill-group">
-          <h3 class="skill-group-title">Tooling & Scripting</h3>
-          <p>
-            Shell Scripting, JS Automation, CLI Tools, and other Automation Scripts
-          </p>
-        </div>
+      <div class="stat">
+        <div class="stat-val">4</div>
+        <div class="stat-key">Projects shipped</div>
       </div>
-    </section>
-
-    <!-- CONTACT -->
-    <section id="contact" class="section narrow">
-      <h2 class="section-title">Contact</h2>
-      <p class="microcopy">Ways to reach me</p>
-      <div class="divider shift-left"></div>
-      <div class="contact">
-        <a href="mailto:youremail@example.com">Email</a>
-        <a href="https://github.com/Vishwesh-Bhilare" target="_blank">GitHub</a>
-        <a href="#" target="_blank">LinkedIn</a>
-        <a href="tel:+910000000000">Phone</a>
+      <div class="stat">
+        <div class="stat-val">#2</div>
+        <div class="stat-key">Hackathon rank (×3)</div>
       </div>
-    </section>
-  </main>
+    </div>
 
-  <script src="script.js"></script>
+    <p class="body">
+      I run <strong>Arch Linux</strong>, prefer the terminal, and care about software that does the least and does it well. My recent work spans local LLM pipelines, neural video object removal, and Bluetooth gesture interfaces — all built for real hardware constraints, not demos.
+    </p>
+
+    <hr class="sep">
+
+    <div class="label">Hackathons</div>
+    <div class="hack-list">
+      <div class="hack-row">
+        <div>
+          <div class="hack-name">Xenia '26</div>
+          <div class="hack-org">PICT — 2026</div>
+        </div>
+        <div class="hack-badge">Runner-up</div>
+      </div>
+      <div class="hack-row">
+        <div>
+          <div class="hack-name">Avinya 2k26</div>
+          <div class="hack-org">IEEE MMCOE — 2026</div>
+        </div>
+        <div class="hack-badge">Runner-up</div>
+      </div>
+      <div class="hack-row">
+        <div>
+          <div class="hack-name">UI/UX Challenge</div>
+          <div class="hack-org">WebsiteVikreta — 2026</div>
+        </div>
+        <div class="hack-badge">Runner-up</div>
+      </div>
+    </div>
+
+    <div class="cert">
+      <div>
+        <div class="cert-name">Oracle Cloud Infrastructure 2025 Generative AI Professional</div>
+        <div class="cert-id">ID: 323468573OCI25GAIOCP &nbsp;·&nbsp; Valid 2025–2027</div>
+      </div>
+      <div class="cert-chip">OCI Certified</div>
+    </div>
+  </div>
+
+  <!-- PROJECTS -->
+  <div id="projects" class="panel">
+    <div class="label">Projects</div>
+    <h2 class="title">Selected work</h2>
+    <p class="subtitle">Four projects built for real constraints — offline-first, no cloud dependency.</p>
+
+    <div class="project-list">
+
+      <div class="project">
+        <div>
+          <div class="project-name">SceneForge</div>
+          <div class="project-stack">YOLOv8 · SAM · ControlNet</div>
+          <ul class="project-desc">
+            <li>Removes any object from video — including humans — runs fully offline.</li>
+            <li>Neural network powered background regeneration.</li>
+            <li>~60% quality parity with high-end servers on average hardware.</li>
+          </ul>
+        </div>
+        <div class="project-year">2026</div>
+      </div>
+
+      <div class="project">
+        <div>
+          <div class="project-name">ReachlyEngine</div>
+          <div class="project-stack">Python · Ollama · Local LLM</div>
+          <ul class="project-desc">
+            <li>Runs entirely local via Ollama — no cloud APIs.</li>
+            <li>Converts LinkedIn profiles into structured personas.</li>
+            <li>Generates personalized multi-channel outreach messages.</li>
+          </ul>
+        </div>
+        <div class="project-year">2026</div>
+      </div>
+
+      <div class="project">
+        <div>
+          <div class="project-name">XGestura</div>
+          <div class="project-stack">ESP32 · MPU6050 · HC-05 Bluetooth</div>
+          <ul class="project-desc">
+            <li>Glove-based motion controller for mouse and keyboard input.</li>
+            <li>MPU6050 for 6-axis motion tracking, HC-05 for wireless communication.</li>
+            <li>Real-time gesture-to-digital interaction with sub-20ms latency.</li>
+          </ul>
+        </div>
+        <div class="project-year">2024–25</div>
+      </div>
+
+      <div class="project">
+        <div>
+          <div class="project-name">Examination Cell Automation Tool</div>
+          <div class="project-stack">MMCOE · IEEE</div>
+          <ul class="project-desc">
+            <li>Automation tool for MMCOE Examination Cell operations.</li>
+            <li>Reduced manual processing time and improved workflow efficiency.</li>
+            <li>Built during IEEE student chapter membership.</li>
+          </ul>
+        </div>
+        <div class="project-year">2025</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SKILLS -->
+  <div id="skills" class="panel">
+    <div class="label">Skills</div>
+    <h2 class="title">Toolkit</h2>
+    <p class="subtitle">Languages, systems, and CS fundamentals I use regularly.</p>
+
+    <div class="skill-section">
+      <div class="skill-section-title">Programming</div>
+      <div class="tags">
+        <span class="tag hi">C++</span>
+        <span class="tag hi">C</span>
+        <span class="tag">Python</span>
+      </div>
+    </div>
+
+    <div class="skill-section">
+      <div class="skill-section-title">Systems & Embedded</div>
+      <div class="tags">
+        <span class="tag hi">Linux (Arch)</span>
+        <span class="tag">ESP32</span>
+        <span class="tag">Arduino</span>
+        <span class="tag">Sensor Integration</span>
+        <span class="tag">Bluetooth / HC-05</span>
+      </div>
+    </div>
+
+    <div class="skill-section">
+      <div class="skill-section-title">AI / ML</div>
+      <div class="tags">
+        <span class="tag">YOLOv8</span>
+        <span class="tag">SAM</span>
+        <span class="tag">ControlNet</span>
+        <span class="tag">Ollama</span>
+        <span class="tag">Local LLMs</span>
+      </div>
+    </div>
+
+    <div class="skill-section">
+      <div class="skill-section-title">CS Fundamentals</div>
+      <div class="tags">
+        <span class="tag hi">Data Structures & Algorithms</span>
+        <span class="tag">OOP</span>
+        <span class="tag">Operating Systems</span>
+        <span class="tag">DBMS</span>
+        <span class="tag">Git</span>
+      </div>
+    </div>
+
+    <hr class="sep">
+
+    <div class="cert">
+      <div>
+        <div class="cert-name">Oracle Cloud Infrastructure 2025 Generative AI Professional</div>
+        <div class="cert-id">ID: 323468573OCI25GAIOCP &nbsp;·&nbsp; Valid 2025–2027</div>
+      </div>
+      <div class="cert-chip">OCI Certified</div>
+    </div>
+  </div>
+
+  <!-- CONTACT -->
+  <div id="contact" class="panel">
+    <div class="label">Contact</div>
+    <h2 class="title">Get in touch</h2>
+    <p class="subtitle">Open to internships, collaborations, and interesting problems.</p>
+
+    <div class="contact-list">
+      <a class="contact-item" href="mailto:bhilarevishwesh@gmail.com">
+        <div class="contact-item-left">
+          <span class="contact-key">Email</span>
+          <span class="contact-val">bhilarevishwesh@gmail.com</span>
+        </div>
+        <span class="contact-arrow">↗</span>
+      </a>
+      <a class="contact-item" href="https://github.com/Vishwesh-Bhilare" target="_blank">
+        <div class="contact-item-left">
+          <span class="contact-key">GitHub</span>
+          <span class="contact-val">Vishwesh-Bhilare</span>
+        </div>
+        <span class="contact-arrow">↗</span>
+      </a>
+      <a class="contact-item" href="https://www.linkedin.com/in/vishwesh-bhilare" target="_blank">
+        <div class="contact-item-left">
+          <span class="contact-key">LinkedIn</span>
+          <span class="contact-val">Vishwesh Bhilare</span>
+        </div>
+        <span class="contact-arrow">↗</span>
+      </a>
+      <a class="contact-item" href="tel:+918380020215">
+        <div class="contact-item-left">
+          <span class="contact-key">Phone</span>
+          <span class="contact-val">+91 83800 20215</span>
+        </div>
+        <span class="contact-arrow">↗</span>
+      </a>
+    </div>
+
+    <div class="edu">
+      <div class="label">Education</div>
+      <div class="edu-degree">B.Tech in Computer Engineering</div>
+      <div class="edu-school">Marathwada Mitra Mandal's College of Engineering, Pune</div>
+      <div class="edu-year">Expected 2028</div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  // Tab switching
+  const tabs = document.querySelectorAll('.tab');
+  const panels = document.querySelectorAll('.panel');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      panels.forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.panel).classList.add('active');
+      document.querySelector('main').scrollTo({ top: 0, behavior: 'instant' });
+    });
+  });
+
+  // Theme toggle
+  const html = document.documentElement;
+  const btn = document.getElementById('themeToggle');
+  const icon = document.getElementById('toggleIcon');
+  const lbl = document.getElementById('toggleLabel');
+
+  btn.addEventListener('click', () => {
+    const isDark = html.dataset.theme === 'dark';
+    html.dataset.theme = isDark ? 'light' : 'dark';
+    icon.textContent = isDark ? '☾' : '☀';
+    lbl.textContent  = isDark ? 'Dark' : 'Light';
+  });
+</script>
 </body>
 </html>
