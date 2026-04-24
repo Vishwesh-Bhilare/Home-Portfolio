@@ -13,7 +13,6 @@
   <meta name="twitter:title" content="Vishwesh Bhilare" />
   <meta name="twitter:description" content="Computer Engineering undergrad. Embedded systems, local AI, and video processing." />
 
-  <!-- SVG Favicon: VB monogram -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0a'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%23f0f0f0' font-family='system-ui,sans-serif' font-weight='700' font-size='14' letter-spacing='-1'%3EVB%3C/text%3E%3C/svg%3E" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,7 +21,8 @@
 
   <style>
 /* ─── CUSTOM CURSOR ─── */
-*, *::before, *::after { cursor: none !important; box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body.cursor-enabled *, body.cursor-enabled *::before, body.cursor-enabled *::after { cursor: none !important; }
 
 #cursor-ring {
   position: fixed; width: 28px; height: 28px;
@@ -33,6 +33,7 @@
               border-color 0.2s ease, background 0.2s ease, opacity 0.2s ease;
   will-change: transform; mix-blend-mode: difference;
   left: -100px; top: -100px;
+  display: none;
 }
 #cursor-dot {
   position: fixed; width: 4px; height: 4px;
@@ -41,10 +42,14 @@
   transform: translate(-50%, -50%);
   transition: transform 0.08s ease, opacity 0.15s ease;
   will-change: transform; left: -100px; top: -100px;
+  display: none;
 }
-body.cursor-hover #cursor-ring { width: 44px; height: 44px; border-color: rgba(240,240,240,0.7); background: rgba(240,240,240,0.03); }
-body.cursor-click #cursor-ring { width: 18px; height: 18px; }
-body.cursor-text  #cursor-ring { width: 22px; height: 22px; border-style: dashed; }
+body.cursor-enabled #cursor-ring,
+body.cursor-enabled #cursor-dot { display: block; }
+
+body.cursor-enabled.cursor-hover #cursor-ring { width: 44px; height: 44px; border-color: rgba(240,240,240,0.7); background: rgba(240,240,240,0.03); }
+body.cursor-enabled.cursor-click #cursor-ring { width: 18px; height: 18px; }
+body.cursor-enabled.cursor-text  #cursor-ring { width: 22px; height: 22px; border-style: dashed; }
 
 /* ─── TOKENS ─── */
 [data-theme="dark"] {
@@ -56,6 +61,8 @@ body.cursor-text  #cursor-ring { width: 22px; height: 22px; border-style: dashed
   --progress-bar: rgba(255,255,255,0.55); --clickable-glow: rgba(255,255,255,0.035);
   --cursor-color: rgba(240,240,240,0.45); --cursor-dot-color: #f0f0f0;
   --focus-ring: rgba(255,255,255,0.5);
+  --accent-green: #4ade80; --accent-green-dim: rgba(74,222,128,0.15);
+  --wip-bg: rgba(255,200,80,0.06); --wip-border: rgba(255,200,80,0.2); --wip-text: #fbbf24;
 }
 [data-theme="light"] {
   --bg: #f7f7f5; --surface: #ffffff; --surface2: #f0f0ee;
@@ -66,13 +73,11 @@ body.cursor-text  #cursor-ring { width: 22px; height: 22px; border-style: dashed
   --progress-bar: rgba(0,0,0,0.45); --clickable-glow: rgba(0,0,0,0.025);
   --cursor-color: rgba(13,13,13,0.45); --cursor-dot-color: #0d0d0d;
   --focus-ring: rgba(0,0,0,0.45);
+  --accent-green: #16a34a; --accent-green-dim: rgba(22,163,74,0.10);
+  --wip-bg: rgba(180,130,0,0.06); --wip-border: rgba(180,130,0,0.2); --wip-text: #92400e;
 }
 
-/* ─── FOCUS ─── */
-:focus-visible {
-  outline: 1.5px solid var(--focus-ring);
-  outline-offset: 3px; border-radius: 4px;
-}
+:focus-visible { outline: 1.5px solid var(--focus-ring); outline-offset: 3px; border-radius: 4px; }
 
 html { height: 100%; }
 body {
@@ -129,18 +134,18 @@ nav { display: flex; flex-direction: column; gap: 1px; }
   display: flex; align-items: center; gap: 9px;
   padding: 9px 10px; border-radius: 5px;
   font-size: 13.5px; font-weight: 400;
-  color: var(--sub); cursor: none; border: none; background: none;
+  color: var(--sub); border: none; background: none;
   text-align: left; width: 100%;
   transition: background 0.15s, color 0.15s;
   letter-spacing: -0.005em;
   position: relative;
 }
+body.cursor-enabled .tab { cursor: none; }
 .tab:hover { background: var(--clickable-glow); color: var(--text); }
 .tab.active { background: var(--tag-bg); color: var(--text); font-weight: 500; }
 .tab-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--muted); flex-shrink: 0; transition: background 0.15s; }
 .tab.active .tab-dot { background: var(--text); }
 
-/* Keyboard shortcut badge */
 .tab-key {
   margin-left: auto; font-size: 10px; color: var(--muted);
   background: var(--surface2); border: 1px solid var(--border);
@@ -150,7 +155,7 @@ nav { display: flex; flex-direction: column; gap: 1px; }
 }
 body.show-keys .tab-key { opacity: 1; }
 
-.sidebar-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 16px; }
+.sidebar-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 10px; }
 .sidebar-links { display: flex; flex-direction: column; gap: 4px; }
 .sidebar-link {
   font-size: 12px; color: var(--sub);
@@ -167,9 +172,14 @@ body.show-keys .tab-key { opacity: 1; }
   border: 1px solid var(--border);
   background: none; color: var(--sub);
   font-size: 12px; font-family: inherit;
-  cursor: none; transition: all 0.15s;
+  transition: all 0.15s; width: 100%;
 }
+body.cursor-enabled .toggle { cursor: none; }
 .toggle:hover { color: var(--text); background: var(--clickable-glow); border-color: var(--border2); }
+.toggle.active { border-color: var(--border2); color: var(--text); background: var(--clickable-glow); }
+
+/* Cursor toggle specific */
+#cursorToggle .cursor-icon { font-size: 13px; }
 
 /* ─── SKIP LINK ─── */
 .skip-link {
@@ -218,6 +228,31 @@ hr.sep { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
 p.body { font-size: 14.5px; line-height: 1.8; color: var(--sub); max-width: 520px; }
 p.body strong { color: var(--text); font-weight: 500; }
 
+/* ─── SEEKING BADGE ─── */
+.seeking-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 11.5px; color: var(--sub);
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 5px; padding: 7px 12px;
+  margin-bottom: 48px; margin-top: -28px;
+  max-width: 480px;
+}
+.seeking-badge strong { color: var(--text); font-weight: 500; }
+.seeking-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent-green); flex-shrink: 0; animation: blink 2.5s ease infinite; }
+
+/* ─── WIP SECTION ─── */
+.wip-section {
+  background: var(--wip-bg);
+  border: 1px solid var(--wip-border);
+  border-radius: 7px; padding: 16px 20px;
+  margin-bottom: 40px;
+}
+.wip-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.wip-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--wip-text); animation: blink 1.8s ease infinite; }
+.wip-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--wip-text); }
+.wip-title { font-size: 13.5px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+.wip-desc { font-size: 12.5px; color: var(--sub); line-height: 1.6; }
+
 /* ─── STATS ─── */
 .stat-row { display: flex; gap: 10px; margin-bottom: 36px; flex-wrap: wrap; }
 .stat { flex: 1; min-width: 130px; padding: 18px 18px 16px; border: 1px solid var(--border); border-radius: 7px; background: var(--surface); }
@@ -226,11 +261,12 @@ p.body strong { color: var(--text); font-weight: 500; }
 
 /* ─── HACKATHONS ─── */
 .hack-list { display: flex; flex-direction: column; }
-.hack-row { display: flex; align-items: center; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--border); }
+.hack-row { display: flex; align-items: flex-start; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--border); gap: 12px; }
 .hack-row:last-child { border-bottom: none; }
 .hack-name { font-size: 13.5px; font-weight: 500; color: var(--text); }
 .hack-org  { font-size: 12px; color: var(--sub); margin-top: 2px; }
-.hack-badge { font-size: 10.5px; padding: 3px 9px; border: 1px solid var(--border); border-radius: 20px; color: var(--sub); }
+.hack-note { font-size: 11px; color: var(--accent-green); margin-top: 3px; }
+.hack-badge { font-size: 10.5px; padding: 3px 9px; border: 1px solid var(--border); border-radius: 20px; color: var(--sub); flex-shrink: 0; }
 
 /* ─── CERT ─── */
 .cert {
@@ -252,6 +288,30 @@ p.body strong { color: var(--text); font-weight: 500; }
 }
 .cert:hover .cert-chip { border-color: var(--border2); color: var(--text); }
 
+/* ─── CERTIFICATES GRID ─── */
+.cert-grid { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.cert-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 13px 18px; border: 1px solid var(--border);
+  border-radius: 6px; background: var(--surface);
+  text-decoration: none; color: inherit;
+  transition: border-color 0.2s, background 0.2s;
+  gap: 12px;
+}
+.cert-item:hover { border-color: var(--border2); background: var(--clickable-glow); }
+.cert-item-left { display: flex; flex-direction: column; gap: 2px; }
+.cert-item-name { font-size: 13px; font-weight: 500; color: var(--text); }
+.cert-item-org { font-size: 11.5px; color: var(--sub); }
+.cert-type {
+  font-size: 9.5px; font-weight: 500; letter-spacing: 0.07em;
+  text-transform: uppercase; padding: 3px 8px;
+  border-radius: 3px; flex-shrink: 0; white-space: nowrap;
+}
+.cert-type.win { background: rgba(74,222,128,0.10); color: var(--accent-green); border: 1px solid rgba(74,222,128,0.2); }
+.cert-type.part { background: var(--surface2); color: var(--sub); border: 1px solid var(--border); }
+.cert-type.appr { background: rgba(96,165,250,0.10); color: #60a5fa; border: 1px solid rgba(96,165,250,0.2); }
+.cert-type.prof { background: rgba(251,146,60,0.10); color: #fb923c; border: 1px solid rgba(251,146,60,0.2); }
+
 /* ─── PROJECTS ─── */
 .project-list { display: flex; flex-direction: column; gap: 2px; }
 .project-card {
@@ -269,12 +329,15 @@ p.body strong { color: var(--text); font-weight: 500; }
 .project-visual canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 
 .project-body { padding: 22px 26px 24px; }
-.project-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+.project-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
 .project-name { font-size: 15.5px; font-weight: 600; letter-spacing: -0.01em; color: var(--text); }
 .project-year { font-size: 11.5px; color: var(--muted); padding-top: 2px; }
+.project-hook { font-size: 13px; color: var(--text); font-weight: 400; margin-bottom: 8px; font-style: italic; opacity: 0.75; }
+.project-arch { font-size: 11.5px; color: var(--sub); margin-bottom: 10px; font-family: 'SF Mono', 'Fira Mono', monospace; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 5px 10px; display: inline-block; }
 .project-stack { font-size: 11.5px; color: var(--sub); margin-bottom: 12px; }
 .project-desc { font-size: 13.5px; color: var(--sub); line-height: 1.7; }
 .project-desc li { margin-left: 16px; margin-bottom: 2px; }
+.project-stat { font-size: 12px; color: var(--accent-green); font-weight: 500; margin-bottom: 10px; background: var(--accent-green-dim); border-radius: 4px; padding: 4px 10px; display: inline-block; }
 .project-links { display: flex; gap: 10px; margin-top: 14px; }
 .project-link {
   font-size: 11.5px; color: var(--sub); text-decoration: none;
@@ -282,6 +345,8 @@ p.body strong { color: var(--text); font-weight: 500; }
   transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
 .project-link:hover { color: var(--text); border-color: var(--border2); background: var(--clickable-glow); }
+.project-link.demo { color: var(--accent-green); border-color: rgba(74,222,128,0.25); }
+.project-link.demo:hover { background: var(--accent-green-dim); border-color: rgba(74,222,128,0.4); color: var(--accent-green); }
 
 /* ─── SKILLS ─── */
 .skill-section { margin-bottom: 28px; }
@@ -335,8 +400,9 @@ p.body strong { color: var(--text); font-weight: 500; }
   border: 1px solid var(--border); border-radius: 5px;
   background: none; color: var(--sub);
   font-family: inherit; font-size: 12.5px;
-  cursor: none; transition: all 0.15s;
+  transition: all 0.15s;
 }
+body.cursor-enabled .print-btn { cursor: none; }
 .print-btn:hover { color: var(--text); border-color: var(--border2); background: var(--clickable-glow); }
 
 /* ─── KEYBOARD NAV HINT ─── */
@@ -368,7 +434,7 @@ p.body strong { color: var(--text); font-weight: 500; }
 .mobile-tab {
   display: flex; flex-direction: column; align-items: center; gap: 3px;
   padding: 6px 12px; border-radius: 8px;
-  background: none; border: none; cursor: none;
+  background: none; border: none;
   color: var(--sub); font-family: inherit; font-size: 10px;
   transition: color 0.15s, background 0.15s; min-width: 56px;
 }
@@ -378,8 +444,7 @@ p.body strong { color: var(--text); font-weight: 500; }
 
 /* ─── MOBILE ─── */
 @media (max-width: 820px) {
-  *, *::before, *::after { cursor: auto !important; }
-  #cursor-ring, #cursor-dot { display: none; }
+  #cursor-ring, #cursor-dot { display: none !important; }
   body { flex-direction: column; overflow: auto; }
   .sidebar {
     width: 100%; height: auto; padding: 14px 18px;
@@ -387,7 +452,7 @@ p.body strong { color: var(--text); font-weight: 500; }
     flex-direction: column; gap: 10px;
   }
   .sidebar-name { margin-bottom: 0; }
-  .sidebar-role, .status, .sidebar-links { display: none; }
+  .sidebar-role, .status, .sidebar-links, .seeking-badge { display: none; }
   nav { display: none; }
   .sidebar-bottom { margin-top: 0; flex-direction: row; align-items: center; gap: 8px; }
   main { height: auto; overflow: visible; padding-bottom: 72px; }
@@ -417,19 +482,14 @@ p.body strong { color: var(--text); font-weight: 500; }
 </head>
 <body>
 
-<!-- Custom cursor elements -->
 <div id="cursor-ring" aria-hidden="true"></div>
 <div id="cursor-dot"  aria-hidden="true"></div>
 
-<!-- Skip to main content -->
 <a class="skip-link" href="#mainScroll">Skip to content</a>
-
-<!-- Scroll progress bar -->
 <div id="scroll-progress" aria-hidden="true"></div>
 
-<!-- Keyboard hint -->
 <div class="kbd-hint" id="kbdHint">
-  <kbd>1</kbd>–<kbd>5</kbd> navigate · <kbd>↑↓</kbd> scroll · <kbd>?</kbd> toggle keys
+  <kbd>1</kbd>–<kbd>6</kbd> navigate · <kbd>↑↓</kbd> scroll · <kbd>?</kbd> toggle keys
 </div>
 
 <div class="blob-wrap" aria-hidden="true">
@@ -450,6 +510,7 @@ p.body strong { color: var(--text); font-weight: 500; }
     <button class="tab"        data-panel="skills"   role="tab" aria-selected="false" aria-controls="skills"   tabindex="-1"><span class="tab-dot"></span>Skills   <span class="tab-key">3</span></button>
     <button class="tab"        data-panel="contact"  role="tab" aria-selected="false" aria-controls="contact"  tabindex="-1"><span class="tab-dot"></span>Contact  <span class="tab-key">4</span></button>
     <button class="tab"        data-panel="resume"   role="tab" aria-selected="false" aria-controls="resume"   tabindex="-1"><span class="tab-dot"></span>Résumé  <span class="tab-key">5</span></button>
+    <button class="tab"        data-panel="certs"    role="tab" aria-selected="false" aria-controls="certs"    tabindex="-1"><span class="tab-dot"></span>Certificates <span class="tab-key">6</span></button>
   </nav>
 
   <div class="sidebar-bottom">
@@ -460,6 +521,10 @@ p.body strong { color: var(--text); font-weight: 500; }
     <button class="toggle" id="themeToggle" aria-label="Toggle colour theme">
       <span id="toggleIcon">☀</span>
       <span id="toggleLabel">Light</span>
+    </button>
+    <button class="toggle" id="cursorToggle" aria-label="Toggle custom cursor" title="Toggle custom cursor">
+      <span class="cursor-icon">◎</span>
+      <span id="cursorLabel">Cursor: Off</span>
     </button>
   </div>
 </aside>
@@ -473,6 +538,21 @@ p.body strong { color: var(--text); font-weight: 500; }
     <h1 class="title">Vishwesh Bhilare</h1>
     <p class="subtitle">Computer engineering undergrad at MMCOE, Pune. Building at the intersection of systems, software, and hardware — from embedded glove controllers to fully local AI pipelines.</p>
 
+    <div class="seeking-badge">
+      <span class="seeking-dot"></span>
+      <span>Looking for: <strong>Systems · Infra · R&amp;D · Pipelines</strong> internships — Summer 2026</span>
+    </div>
+
+    <!-- Currently Working -->
+    <div class="wip-section">
+      <div class="wip-header">
+        <div class="wip-dot"></div>
+        <div class="wip-label">Currently working on</div>
+      </div>
+      <div class="wip-title">Rebuilding the Mesh Network Protocol</div>
+      <div class="wip-desc">Migrating the entire Resilient Offline Mesh Communication Protocol to a more suitable framework — better performance, cleaner protocol design, and improved TTL-based propagation logic.</div>
+    </div>
+
     <div class="stat-row">
       <div class="stat"><div class="stat-val">2028</div><div class="stat-key">Expected graduation</div></div>
       <div class="stat"><div class="stat-val">5</div><div class="stat-key">Projects shipped</div></div>
@@ -485,11 +565,37 @@ p.body strong { color: var(--text); font-weight: 500; }
     </p>
 
     <hr class="sep">
-    <div class="label">Hackathons — 2026</div>
+    <div class="label">Hackathons &amp; Competitions — 2026</div>
     <div class="hack-list">
-      <div class="hack-row"><div><div class="hack-name">Xenia '26</div><div class="hack-org">PICT</div></div><div class="hack-badge">Runner-up</div></div>
-      <div class="hack-row"><div><div class="hack-name">Avinya 2k26</div><div class="hack-org">IEEE MMCOE</div></div><div class="hack-badge">Runner-up</div></div>
-      <div class="hack-row"><div><div class="hack-name">UI/UX Challenge</div><div class="hack-org">WebsiteVikreta</div></div><div class="hack-badge">Runner-up</div></div>
+      <div class="hack-row">
+        <div>
+          <div class="hack-name">Xenia '26</div>
+          <div class="hack-org">PICT</div>
+        </div>
+        <div class="hack-badge">Runner-up</div>
+      </div>
+      <div class="hack-row">
+        <div>
+          <div class="hack-name">Avinya 2k26</div>
+          <div class="hack-org">IEEE MMCOE</div>
+        </div>
+        <div class="hack-badge">Runner-up</div>
+      </div>
+      <div class="hack-row">
+        <div>
+          <div class="hack-name">UI/UX Challenge</div>
+          <div class="hack-org">WebsiteVikreta</div>
+        </div>
+        <div class="hack-badge">Runner-up</div>
+      </div>
+      <div class="hack-row">
+        <div>
+          <div class="hack-name">In-house Project Competition</div>
+          <div class="hack-org">MMCOE · 2026</div>
+          <div class="hack-note">↳ Selected for 3-day live deployment within the college</div>
+        </div>
+        <div class="hack-badge">Winner</div>
+      </div>
     </div>
 
     <a class="cert" href="https://drive.google.com/file/d/1dE7-rnkvFcpmr5aGantJBd5N2eSzv80X/view?usp=sharing" target="_blank" rel="noopener" aria-label="View Oracle OCI certification">
@@ -525,15 +631,19 @@ p.body strong { color: var(--text); font-weight: 500; }
             <div class="project-name">SceneForge</div>
             <div class="project-year">2026</div>
           </div>
+          <div class="project-hook">Remove players from live football footage — fully offline, no cloud.</div>
+          <div class="project-arch">detect → track → homography → inpaint</div>
+          <div class="project-stat">~60% SSIM vs server-grade pipelines · RTX 4050</div>
           <div class="project-stack">YOLOv8 · SAM · ControlNet · Stable Diffusion</div>
           <ul class="project-desc">
             <li>Detects, tracks, and removes selected players from football broadcast footage using YOLOv8 segmentation.</li>
             <li>Motion-compensated homography background reconstruction fills removed regions across frames.</li>
             <li>Optional Stable Diffusion + ControlNet inpainting for high-quality fill on CUDA hardware.</li>
-            <li>~60% quality parity with high-end servers on average hardware, fully offline.</li>
+            <li>Runs fully offline; ~60% quality parity with high-end servers on average hardware.</li>
           </ul>
           <div class="project-links">
             <a class="project-link" href="https://github.com/Vishwesh-Bhilare/SceneForge" target="_blank" rel="noopener">GitHub ↗</a>
+            <a class="project-link demo" href="https://youtu.be/xaewRpa_Z4k" target="_blank" rel="noopener">▶ Demo</a>
           </div>
         </div>
       </div>
@@ -546,6 +656,8 @@ p.body strong { color: var(--text); font-weight: 500; }
             <div class="project-name">ReachlyEngine</div>
             <div class="project-year">2026</div>
           </div>
+          <div class="project-hook">Hyper-personalized outreach at scale — your LLM, your data, zero cloud.</div>
+          <div class="project-arch">fetch → analyze → persona → generate → dispatch</div>
           <div class="project-stack">Python · Ollama · SQLite · Rich CLI</div>
           <ul class="project-desc">
             <li>Offline LLM outreach engine — fetches LinkedIn profiles via authenticated session, no cloud APIs.</li>
@@ -555,6 +667,7 @@ p.body strong { color: var(--text); font-weight: 500; }
           </ul>
           <div class="project-links">
             <a class="project-link" href="https://github.com/Vishwesh-Bhilare/ReachlyEngine" target="_blank" rel="noopener">GitHub ↗</a>
+            <a class="project-link demo" href="https://youtu.be/lhGcSJC62J8" target="_blank" rel="noopener">▶ Demo</a>
           </div>
         </div>
       </div>
@@ -567,12 +680,14 @@ p.body strong { color: var(--text); font-weight: 500; }
             <div class="project-name">Resilient Offline Mesh Communication Protocol</div>
             <div class="project-year">2026</div>
           </div>
+          <div class="project-hook">Internet-free mesh that keeps talking when everything else goes dark.</div>
+          <div class="project-arch">broadcast → discover → propagate (TTL) → upload on gateway join</div>
           <div class="project-stack">Embedded · BLE / LoRa · Mesh Networking · Protocol Design</div>
           <ul class="project-desc">
+            <li>Custom lightweight routing protocol with TTL-based propagation — no central coordinator, no internet required.</li>
             <li>Each device gets a unique ID and continuously pings nearby nodes, maintaining a live presence map of the mesh.</li>
-            <li>Peer discovery propagates hop-by-hop — no central coordinator, no internet required.</li>
-            <li>When a gateway device with internet joins, all accumulated node IDs and presence data are published upstream.</li>
-            <li>Designed for resilience in disconnected environments: disaster zones, remote field ops, offline campuses.</li>
+            <li>Peer discovery propagates hop-by-hop; when a gateway device joins, accumulated node data is published upstream.</li>
+            <li>Designed for resilience: disaster zones, remote field ops, offline campuses.</li>
           </ul>
         </div>
       </div>
@@ -585,6 +700,8 @@ p.body strong { color: var(--text); font-weight: 500; }
             <div class="project-name">XGestura</div>
             <div class="project-year">2024–25</div>
           </div>
+          <div class="project-hook">Your hand becomes the mouse — 6-axis IMU data, real HID events, no wires.</div>
+          <div class="project-arch">IMU → ESP32 → BT serial → Python HID injection</div>
           <div class="project-stack">C++ · C · ESP32 · MPU6050 · HC-05 Bluetooth</div>
           <ul class="project-desc">
             <li>Glove-based motion controller translating 6-axis IMU data into mouse and keyboard input.</li>
@@ -605,6 +722,8 @@ p.body strong { color: var(--text); font-weight: 500; }
             <div class="project-name">Examination Cell Automation Tool</div>
             <div class="project-year">2025</div>
           </div>
+          <div class="project-hook">Cut manual overhead at MMCOE's exam cell — built and shipped in one semester.</div>
+          <div class="project-arch">input → validate → process → report</div>
           <div class="project-stack">MMCOE · IEEE Member</div>
           <ul class="project-desc">
             <li>Internal automation tool for MMCOE Examination Cell operations.</li>
@@ -626,7 +745,7 @@ p.body strong { color: var(--text); font-weight: 500; }
     <div class="skill-section">
       <div class="skill-section-title">Programming</div>
       <div class="tags">
-        <span class="tag hi">C++</span><span class="tag hi">C</span><span class="tag">Python</span>
+        <span class="tag hi">C++</span><span class="tag hi">C</span><span class="tag">Python</span><span class="tag">Java — Fundamentals</span>
       </div>
     </div>
     <div class="skill-section">
@@ -641,6 +760,12 @@ p.body strong { color: var(--text); font-weight: 500; }
       <div class="tags">
         <span class="tag">YOLOv8</span><span class="tag">SAM</span><span class="tag">ControlNet</span>
         <span class="tag">Stable Diffusion</span><span class="tag">Ollama</span><span class="tag">Local LLMs</span><span class="tag">OpenCV</span>
+      </div>
+    </div>
+    <div class="skill-section">
+      <div class="skill-section-title">Networking</div>
+      <div class="tags">
+        <span class="tag">Mesh Protocols</span><span class="tag">BLE / LoRa</span><span class="tag">TCP/IP</span><span class="tag">Protocol Design</span>
       </div>
     </div>
     <div class="skill-section">
@@ -704,6 +829,13 @@ p.body strong { color: var(--text); font-weight: 500; }
       <div class="r-contact">bhilarevishwesh@gmail.com · +91 83800 20215 · Pune, India · github.com/Vishwesh-Bhilare · linkedin.com/in/vishwesh-bhilare</div>
 
       <div class="r-section">
+        <div class="r-section-title">Seeking</div>
+        <div class="r-item">
+          <div class="r-item-sub">Systems · Infrastructure · R&amp;D · Pipelines internships — Summer 2026</div>
+        </div>
+      </div>
+
+      <div class="r-section">
         <div class="r-section-title">Education</div>
         <div class="r-item">
           <div class="r-item-title">B.Tech in Computer Engineering</div>
@@ -715,26 +847,26 @@ p.body strong { color: var(--text); font-weight: 500; }
         <div class="r-section-title">Projects</div>
         <div class="r-item">
           <div class="r-item-title">SceneForge <span style="font-weight:400;color:var(--sub)">— YOLOv8 · SAM · ControlNet · Stable Diffusion</span></div>
-          <div class="r-item-sub">2026</div>
+          <div class="r-item-sub">2026 · <a href="https://youtu.be/xaewRpa_Z4k" style="color:var(--sub)" target="_blank">Demo ↗</a></div>
           <ul>
-            <li>Football player removal pipeline using YOLOv8 segmentation and IoU-based tracking across frames.</li>
-            <li>Motion-compensated homography background reconstruction; optional SD inpainting for high-quality fill.</li>
-            <li>~60% quality parity with high-end servers on average hardware, runs fully offline.</li>
+            <li>Pipeline: detection → tracking → homography reconstruction → optional SD inpainting.</li>
+            <li>Motion-compensated background fill across frames; fully offline on average hardware.</li>
+            <li>Achieves ~60% SSIM vs server-grade pipelines on RTX 4050.</li>
           </ul>
         </div>
         <div class="r-item">
           <div class="r-item-title">Resilient Offline Mesh Communication Protocol <span style="font-weight:400;color:var(--sub)">— Embedded · BLE / LoRa</span></div>
           <div class="r-item-sub">2026</div>
           <ul>
-            <li>Peer-to-peer mesh where each node broadcasts a unique ID; presence maps propagate hop-by-hop without internet.</li>
-            <li>Gateway device uploads accumulated node data when internet connectivity becomes available.</li>
+            <li>Custom lightweight routing protocol with TTL-based hop-by-hop propagation; zero central coordinator.</li>
+            <li>Gateway device uploads accumulated node presence data when internet becomes available.</li>
           </ul>
         </div>
         <div class="r-item">
           <div class="r-item-title">ReachlyEngine <span style="font-weight:400;color:var(--sub)">— Python · Ollama · SQLite</span></div>
-          <div class="r-item-sub">2026</div>
+          <div class="r-item-sub">2026 · <a href="https://youtu.be/lhGcSJC62J8" style="color:var(--sub)" target="_blank">Demo ↗</a></div>
           <ul>
-            <li>Offline LLM outreach engine; fetches and analyzes LinkedIn profiles into structured personas.</li>
+            <li>Offline LLM outreach engine; pipeline: fetch → analyze → persona → generate → dispatch.</li>
             <li>Generates tailored messages for Email, WhatsApp, LinkedIn DM, and Instagram DM via local Ollama model.</li>
           </ul>
         </div>
@@ -742,7 +874,7 @@ p.body strong { color: var(--text); font-weight: 500; }
           <div class="r-item-title">XGestura <span style="font-weight:400;color:var(--sub)">— C++ · ESP32 · MPU6050 · HC-05</span></div>
           <div class="r-item-sub">2024–25</div>
           <ul>
-            <li>Glove-based motion controller translating 6-axis IMU data to mouse and keyboard HID events over Bluetooth.</li>
+            <li>Glove controller pipeline: IMU → ESP32 → BT serial → Python HID injection. 6-axis real-time input.</li>
           </ul>
         </div>
         <div class="r-item">
@@ -757,9 +889,10 @@ p.body strong { color: var(--text); font-weight: 500; }
       <div class="r-section">
         <div class="r-section-title">Skills</div>
         <div class="r-item">
-          <div class="r-item-sub"><strong style="color:var(--text)">Programming:</strong> C++ (highly proficient), C, Python</div>
+          <div class="r-item-sub"><strong style="color:var(--text)">Programming:</strong> C++ (highly proficient), C, Python, Java (fundamentals)</div>
           <div class="r-item-sub"><strong style="color:var(--text)">Systems & Embedded:</strong> Linux (Arch), ESP32, Arduino, MPU6050, HC-05, sensor integration</div>
           <div class="r-item-sub"><strong style="color:var(--text)">AI / ML:</strong> YOLOv8, SAM, ControlNet, Stable Diffusion, Ollama, OpenCV</div>
+          <div class="r-item-sub"><strong style="color:var(--text)">Networking:</strong> Mesh protocols, BLE/LoRa, TCP/IP, protocol design</div>
           <div class="r-item-sub"><strong style="color:var(--text)">CS:</strong> DSA, OOP, Operating Systems, DBMS, Git</div>
         </div>
       </div>
@@ -779,6 +912,7 @@ p.body strong { color: var(--text); font-weight: 500; }
             <li>Runner-up — Xenia '26, PICT (2026)</li>
             <li>Runner-up — Avinya 2k26, IEEE MMCOE (2026)</li>
             <li>Runner-up — UI/UX Challenge, WebsiteVikreta (2026)</li>
+            <li>Winner — In-house Project Competition, MMCOE (2026) · Selected for 3-day live deployment</li>
           </ul>
         </div>
       </div>
@@ -788,6 +922,68 @@ p.body strong { color: var(--text); font-weight: 500; }
         <div class="r-item">
           <div class="r-item-sub">English — Fluent · Marathi — Native · Hindi — Fluent</div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CERTIFICATES -->
+  <div id="certs" class="panel" role="tabpanel" aria-labelledby="tab-certs">
+    <div class="eyebrow">Certificates</div>
+    <h2 class="title">Recognition & Credentials</h2>
+    <p class="subtitle">Certifications, competition wins, appreciations, and participation records.</p>
+
+    <div class="label" style="margin-bottom: 12px;">Professional</div>
+    <div class="cert-grid">
+      <a class="cert-item" href="https://drive.google.com/file/d/1dE7-rnkvFcpmr5aGantJBd5N2eSzv80X/view?usp=sharing" target="_blank" rel="noopener">
+        <div class="cert-item-left">
+          <div class="cert-item-name">Oracle Cloud Infrastructure 2025 Generative AI Professional</div>
+          <div class="cert-item-org">Oracle · ID: 323468573OCI25GAIOCP · Valid 2025–2027</div>
+        </div>
+        <span class="cert-type prof">Professional</span>
+      </a>
+    </div>
+
+    <div class="label" style="margin-top: 32px; margin-bottom: 12px;">Competition Wins</div>
+    <div class="cert-grid">
+      <div class="cert-item">
+        <div class="cert-item-left">
+          <div class="cert-item-name">Runner-up — Xenia '26</div>
+          <div class="cert-item-org">PICT · 2026</div>
+        </div>
+        <span class="cert-type win">Runner-up</span>
+      </div>
+      <div class="cert-item">
+        <div class="cert-item-left">
+          <div class="cert-item-name">Runner-up — Avinya 2k26</div>
+          <div class="cert-item-org">IEEE MMCOE · 2026</div>
+        </div>
+        <span class="cert-type win">Runner-up</span>
+      </div>
+      <div class="cert-item">
+        <div class="cert-item-left">
+          <div class="cert-item-name">Runner-up — UI/UX Challenge</div>
+          <div class="cert-item-org">WebsiteVikreta · 2026</div>
+        </div>
+        <span class="cert-type win">Runner-up</span>
+      </div>
+      <div class="cert-item">
+        <div class="cert-item-left">
+          <div class="cert-item-name">Selected — In-house Project Competition</div>
+          <div class="cert-item-org">MMCOE · 2026 · 3-day live deployment</div>
+        </div>
+        <span class="cert-type win">Selected</span>
+      </div>
+    </div>
+
+    <div class="label" style="margin-top: 32px; margin-bottom: 12px;">Participation & Appreciation</div>
+    <div class="cert-grid" id="extraCertGrid">
+      <!-- Add your participation / appreciation certs here as you collect them -->
+      <div class="cert-item" style="opacity: 0.5; pointer-events: none; border-style: dashed;">
+        <div class="cert-item-left">
+          <div class="cert-item-name">More certificates coming soon</div>
+          <div class="cert-item-org">This section grows as you earn them</div>
+        </div>
+        <span class="cert-type part">—</span>
       </div>
     </div>
   </div>
@@ -817,6 +1013,10 @@ p.body strong { color: var(--text); font-weight: 500; }
       <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 2h10a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M7 7h6M7 10h6M7 13h4"/></svg>
       <span class="mobile-tab-label">Résumé</span>
     </button>
+    <button class="mobile-tab" data-panel="certs">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2l1.5 4.5H16l-3.7 2.7 1.4 4.3L10 11l-3.7 2.5 1.4-4.3L4 6.5h4.5z"/></svg>
+      <span class="mobile-tab-label">Certs</span>
+    </button>
   </div>
 </nav>
 
@@ -827,37 +1027,72 @@ const mainEl   = document.getElementById('mainScroll');
 const progress = document.getElementById('scroll-progress');
 const kbdHint  = document.getElementById('kbdHint');
 
-/* ── CUSTOM CURSOR ── */
+/* ── CUSTOM CURSOR (OPT-IN) ── */
 const ring = document.getElementById('cursor-ring');
 const dot  = document.getElementById('cursor-dot');
 let mx = -100, my = -100, rx = -100, ry = -100;
 let cursorVisible = false;
+let cursorEnabled = false;
+
+const cursorToggleBtn = document.getElementById('cursorToggle');
+const cursorLabel = document.getElementById('cursorLabel');
+
+function enableCursor() {
+  cursorEnabled = true;
+  document.body.classList.add('cursor-enabled');
+  cursorToggleBtn.classList.add('active');
+  cursorLabel.textContent = 'Cursor: On';
+  try { localStorage.setItem('vb-cursor', '1'); } catch(e){}
+}
+function disableCursor() {
+  cursorEnabled = false;
+  document.body.classList.remove('cursor-enabled');
+  cursorToggleBtn.classList.remove('active');
+  cursorLabel.textContent = 'Cursor: Off';
+  ring.style.opacity = '0';
+  dot.style.opacity = '0';
+  try { localStorage.setItem('vb-cursor', '0'); } catch(e){}
+}
+
+cursorToggleBtn.addEventListener('click', () => {
+  if (cursorEnabled) disableCursor(); else enableCursor();
+});
+
+// Restore preference
+try {
+  if (localStorage.getItem('vb-cursor') === '1') enableCursor();
+} catch(e){}
 
 document.addEventListener('mousemove', e => {
+  if (!cursorEnabled) return;
   mx = e.clientX; my = e.clientY;
   if (!cursorVisible) { ring.style.opacity = '1'; dot.style.opacity = '1'; cursorVisible = true; }
   dot.style.left = mx + 'px'; dot.style.top = my + 'px';
 });
-document.addEventListener('mouseleave', () => { ring.style.opacity = '0'; dot.style.opacity = '0'; cursorVisible = false; });
+document.addEventListener('mouseleave', () => {
+  ring.style.opacity = '0'; dot.style.opacity = '0'; cursorVisible = false;
+});
 
-// Smooth ring follow with lag
 function animateCursor() {
-  rx += (mx - rx) * 0.12;
-  ry += (my - ry) * 0.12;
-  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  if (cursorEnabled) {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  }
   requestAnimationFrame(animateCursor);
 }
 animateCursor();
 
-// Hover effect on interactive elements
-const interactiveSelectors = 'a, button, .project-card, .cert, .tag, .contact-item, .tab, .toggle, .print-btn';
+const interactiveSelectors = 'a, button, .project-card, .cert, .cert-item, .tag, .contact-item, .tab, .toggle, .print-btn';
 document.addEventListener('mouseover', e => {
+  if (!cursorEnabled) return;
   if (e.target.closest(interactiveSelectors)) document.body.classList.add('cursor-hover');
 });
 document.addEventListener('mouseout', e => {
+  if (!cursorEnabled) return;
   if (e.target.closest(interactiveSelectors)) document.body.classList.remove('cursor-hover');
 });
-document.addEventListener('mousedown', () => document.body.classList.add('cursor-click'));
+document.addEventListener('mousedown', () => { if (cursorEnabled) document.body.classList.add('cursor-click'); });
 document.addEventListener('mouseup',   () => document.body.classList.remove('cursor-click'));
 
 /* ── SCROLL PROGRESS ── */
@@ -874,7 +1109,7 @@ mainEl.addEventListener('scroll', () => {
 const tabs       = [...document.querySelectorAll('.tab')];
 const mobileTabs = [...document.querySelectorAll('.mobile-tab')];
 const panels     = [...document.querySelectorAll('.panel')];
-const PANELS     = ['profile','projects','skills','contact','resume'];
+const PANELS     = ['profile','projects','skills','contact','resume','certs'];
 
 function switchPanel(name) {
   const currentPanel = document.querySelector('.panel.active');
@@ -894,10 +1129,7 @@ function switchPanel(name) {
   });
 
   mainEl.scrollTo({ top: 0, behavior: 'instant' });
-
   if (name === 'projects') requestAnimationFrame(initCanvases);
-
-  // Update progress visibility
   progress.classList.remove('active');
 }
 
@@ -909,16 +1141,14 @@ let kbdHintTimeout;
 document.addEventListener('keydown', e => {
   const key = e.key;
 
-  // Number keys 1-5 for panels
-  if (['1','2','3','4','5'].includes(key) && !e.ctrlKey && !e.metaKey && !e.altKey) {
+  if (['1','2','3','4','5','6'].includes(key) && !e.ctrlKey && !e.metaKey && !e.altKey) {
     const target = document.activeElement;
     if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
     switchPanel(PANELS[+key - 1]);
-    tabs[+key - 1].focus();
+    if (tabs[+key - 1]) tabs[+key - 1].focus();
     return;
   }
 
-  // Arrow keys for tab navigation within sidebar
   if (e.target.closest('nav')) {
     const activeTab = document.querySelector('.tab.active');
     const idx = tabs.indexOf(activeTab);
@@ -928,13 +1158,11 @@ document.addEventListener('keydown', e => {
     if (key === 'End')  { e.preventDefault(); tabs[tabs.length-1].focus(); switchPanel(tabs[tabs.length-1].dataset.panel); }
   }
 
-  // Scroll in main
   if (key === 'ArrowDown' && !e.target.closest('nav')) mainEl.scrollBy({ top: 80, behavior: 'smooth' });
   if (key === 'ArrowUp'   && !e.target.closest('nav')) mainEl.scrollBy({ top: -80, behavior: 'smooth' });
   if (key === 'PageDown') mainEl.scrollBy({ top: 400, behavior: 'smooth' });
   if (key === 'PageUp')   mainEl.scrollBy({ top: -400, behavior: 'smooth' });
 
-  // ? toggle keyboard hints
   if (key === '?') {
     document.body.classList.toggle('show-keys');
     kbdHint.classList.add('visible');
@@ -942,7 +1170,6 @@ document.addEventListener('keydown', e => {
     kbdHintTimeout = setTimeout(() => kbdHint.classList.remove('visible'), 3000);
   }
 
-  // Show hint on Tab key
   if (key === 'Tab') {
     kbdHint.classList.add('visible');
     clearTimeout(kbdHintTimeout);
@@ -986,50 +1213,275 @@ function initCanvases() {
   initExamCell();
 }
 
-/* ── SceneForge: frame decomposition grid with segment masks ── */
+/* ── SceneForge ── */
 function initSceneForge() {
   const canvas = document.getElementById('cv-sceneforge');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
   resize(); window.addEventListener('resize', resize);
-  const COLS = 12, ROWS = 4;
+
+  // Pipeline stages matching actual SceneForge: detect → segment → track → reconstruct → inpaint
+  // We animate left-to-right processing stages across the canvas
   let t = 0;
-  const masks = [{c:2,r:1},{c:3,r:1},{c:3,r:2},{c:4,r:2},{c:7,r:1},{c:8,r:1},{c:8,r:2}];
+
+  // Simulated "player" silhouettes as simple rect+ellipse combos
+  const players = [
+    { bx: 0.22, by: 0.32, bw: 0.055, bh: 0.55, phase: 0 },   // player 1
+    { bx: 0.48, by: 0.28, bw: 0.050, bh: 0.52, phase: 1.4 },  // player 2
+    { bx: 0.68, by: 0.36, bw: 0.048, bh: 0.50, phase: 2.8 },  // player 3
+  ];
+
+  // Field lines (simplified top-down view)
+  function drawField(W, H, alpha) {
+    ctx.globalAlpha = alpha;
+    const isDark = html.dataset.theme === 'dark';
+    const grassColor = isDark ? 'rgba(30,60,30,0.9)' : 'rgba(60,120,50,0.8)';
+    const lineColor  = isDark ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.55)';
+
+    // Grass
+    ctx.fillStyle = grassColor;
+    ctx.fillRect(0, 0, W, H);
+
+    // Alternating stripe bands
+    for (let i = 0; i < 6; i++) {
+      if (i % 2 === 0) {
+        ctx.fillStyle = isDark ? 'rgba(35,70,35,0.6)' : 'rgba(70,140,60,0.4)';
+        ctx.fillRect(i * W/6, 0, W/6, H);
+      }
+    }
+
+    // White lines
+    ctx.strokeStyle = lineColor; ctx.lineWidth = 1.5;
+    // Centre line
+    ctx.beginPath(); ctx.moveTo(W/2, 0); ctx.lineTo(W/2, H); ctx.stroke();
+    // Centre circle
+    ctx.beginPath(); ctx.arc(W/2, H/2, H*0.28, 0, Math.PI*2); ctx.stroke();
+    // Outer border
+    ctx.strokeRect(W*0.04, H*0.06, W*0.92, H*0.88);
+    // Left penalty box
+    ctx.strokeRect(W*0.04, H*0.22, W*0.14, H*0.56);
+    // Right penalty box
+    ctx.strokeRect(W*0.82, H*0.22, W*0.14, H*0.56);
+
+    ctx.globalAlpha = 1;
+  }
+
+  // Draw a player shape at normalised coords
+  function drawPlayer(W, H, p, style, alpha, maskAlpha, scanProgress) {
+    const x = p.bx * W, y = p.by * H;
+    const w = p.bw * W, h = p.bh * H;
+
+    if (style === 'bbox') {
+      // YOLO bounding box
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = '#ffdd00'; ctx.lineWidth = 1.5;
+      ctx.strokeRect(x, y, w, h);
+      // Confidence label
+      ctx.fillStyle = '#ffdd00';
+      ctx.font = `bold ${Math.max(7, W*0.012)}px monospace`;
+      ctx.textAlign = 'left';
+      ctx.fillText('player 0.94', x, y - 3);
+      ctx.globalAlpha = 1;
+    } else if (style === 'mask') {
+      // SAM segmentation mask overlay
+      const isDark = html.dataset.theme === 'dark';
+      ctx.globalAlpha = maskAlpha;
+      ctx.fillStyle = isDark ? 'rgba(255,80,80,0.45)' : 'rgba(220,50,50,0.35)';
+      // Slightly irregular polygon to look like a real mask
+      ctx.beginPath();
+      ctx.moveTo(x + w*0.15, y + h*0.05);
+      ctx.bezierCurveTo(x + w*0.5, y - h*0.03, x + w*0.85, y + h*0.08, x + w*0.9, y + h*0.4);
+      ctx.bezierCurveTo(x + w*0.95, y + h*0.7, x + w*0.75, y + h*1.02, x + w*0.45, y + h*1.0);
+      ctx.bezierCurveTo(x + w*0.15, y + h*0.98, x - w*0.05, y + h*0.75, x + w*0.05, y + h*0.4);
+      ctx.closePath();
+      ctx.fill();
+      // Mask outline
+      ctx.globalAlpha = maskAlpha * 0.9;
+      ctx.strokeStyle = isDark ? 'rgba(255,100,100,0.8)' : 'rgba(200,50,50,0.7)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    } else if (style === 'removed') {
+      // After removal: show reconstructed background patch with subtle grid
+      const isDark = html.dataset.theme === 'dark';
+      ctx.globalAlpha = alpha * 0.85;
+      // Reconstructed patch (slightly different green to show it's filled)
+      ctx.fillStyle = isDark ? 'rgba(40,80,40,0.9)' : 'rgba(65,130,55,0.85)';
+      ctx.beginPath();
+      ctx.moveTo(x + w*0.15, y + h*0.05);
+      ctx.bezierCurveTo(x + w*0.5, y - h*0.03, x + w*0.85, y + h*0.08, x + w*0.9, y + h*0.4);
+      ctx.bezierCurveTo(x + w*0.95, y + h*0.7, x + w*0.75, y + h*1.02, x + w*0.45, y + h*1.0);
+      ctx.bezierCurveTo(x + w*0.15, y + h*0.98, x - w*0.05, y + h*0.75, x + w*0.05, y + h*0.4);
+      ctx.closePath();
+      ctx.fill();
+      // Fine texture lines to imply inpainting
+      ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.15)';
+      ctx.lineWidth = 0.5;
+      for (let li = 0; li < 5; li++) {
+        ctx.beginPath();
+        ctx.moveTo(x + w*0.1, y + h*(0.15 + li*0.18));
+        ctx.lineTo(x + w*0.85, y + h*(0.18 + li*0.17));
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  // Stage labels
+  const stages = ['DETECT', 'SEGMENT', 'TRACK', 'RECONSTRUCT', 'INPAINT'];
+
   function draw() {
     const W = canvas.width, H = canvas.height;
     ctx.clearRect(0, 0, W, H);
-    const cw = W / COLS, ch = H / ROWS;
+    const isDark = html.dataset.theme === 'dark';
+    const dotCol = getCSSVar('--canvas-dot');
     const lineCol = getCSSVar('--canvas-line');
-    const dotCol  = getCSSVar('--canvas-dot');
-    ctx.strokeStyle = lineCol; ctx.lineWidth = 0.5;
-    for (let c = 0; c <= COLS; c++) { ctx.beginPath(); ctx.moveTo(c*cw,0); ctx.lineTo(c*cw,H); ctx.stroke(); }
-    for (let r = 0; r <= ROWS; r++) { ctx.beginPath(); ctx.moveTo(0,r*ch); ctx.lineTo(W,r*ch); ctx.stroke(); }
-    masks.forEach((m, i) => {
-      const alpha = 0.3 + 0.25*Math.sin(t*0.04 + i*1.1);
-      ctx.globalAlpha = alpha * (html.dataset.theme==='dark' ? 0.5 : 0.25);
-      ctx.fillStyle = dotCol; ctx.fillRect(m.c*cw+1, m.r*ch+1, cw-2, ch-2);
-      ctx.globalAlpha = 1;
-    });
-    const scanX = ((t*0.8) % (W+60)) - 30;
-    const grad = ctx.createLinearGradient(scanX-30,0,scanX+30,0);
-    grad.addColorStop(0,'transparent'); grad.addColorStop(0.5,dotCol); grad.addColorStop(1,'transparent');
-    ctx.strokeStyle = grad; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(scanX,0); ctx.lineTo(scanX,H); ctx.stroke();
-    for (let c = 0; c <= COLS; c++) {
-      for (let r = 0; r <= ROWS; r++) {
-        const pulse = 0.4+0.3*Math.sin(t*0.03+c*0.5+r*0.8);
-        ctx.globalAlpha = pulse; ctx.fillStyle = dotCol;
-        ctx.fillRect(c*cw-1, r*ch-1, 2, 2);
+
+    // Full cycle: 300 frames total, each stage gets 60 frames
+    const cycle = t % 360;
+    const stage = Math.floor(cycle / 72); // 0-4
+    const stageT = (cycle % 72) / 72;    // 0→1 within stage
+
+    // Field is always visible
+    drawField(W, H, 1.0);
+
+    // Stage 0: RAW — just the field + raw players (silhouettes)
+    // Stage 1: DETECT — bounding boxes appear
+    // Stage 2: SEGMENT — masks overlay
+    // Stage 3: TRACK — ID labels + motion trail
+    // Stage 4: RECONSTRUCT / INPAINT — players removed, bg filled
+
+    players.forEach((p, pi) => {
+      const staggerT = Math.max(0, Math.min(1, stageT * 1.5 - pi * 0.15));
+
+      if (stage <= 2) {
+        // Draw raw player silhouette
+        ctx.globalAlpha = 0.85;
+        ctx.fillStyle = isDark ? 'rgba(50,50,80,0.9)' : 'rgba(30,30,70,0.85)';
+        // Body
+        ctx.fillRect(p.bx*W + p.bw*W*0.2, p.by*H + p.bh*H*0.1, p.bw*W*0.6, p.bh*H*0.65);
+        // Head
+        ctx.beginPath();
+        ctx.arc(p.bx*W + p.bw*W*0.5, p.by*H + p.bh*H*0.07, p.bw*W*0.28, 0, Math.PI*2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
       }
-    }
-    ctx.globalAlpha = 1;
+
+      if (stage === 1) {
+        // Bounding boxes fade in
+        drawPlayer(W, H, p, 'bbox', staggerT, 0, 0);
+      }
+
+      if (stage === 2) {
+        // Masks appear on top of bbox
+        drawPlayer(W, H, p, 'bbox', 0.55, 0, 0);
+        drawPlayer(W, H, p, 'mask', 0, staggerT * 0.85, 0);
+      }
+
+      if (stage === 3) {
+        // Track: show bbox + mask + motion arrow + ID badge
+        drawPlayer(W, H, p, 'bbox', 0.5, 0, 0);
+        drawPlayer(W, H, p, 'mask', 0, 0.55, 0);
+        // Motion trail dots
+        ctx.globalAlpha = staggerT * 0.7;
+        for (let tr = 1; tr <= 4; tr++) {
+          const tx = (p.bx + p.bw*0.5)*W - tr * W * 0.022;
+          const ty = (p.by + p.bh*0.5)*H - tr * H * 0.018;
+          ctx.fillStyle = isDark ? 'rgba(255,200,80,0.6)' : 'rgba(200,140,0,0.55)';
+          ctx.beginPath(); ctx.arc(tx, ty, Math.max(1, 2.5 - tr*0.4), 0, Math.PI*2); ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+        // ID badge
+        ctx.globalAlpha = staggerT;
+        ctx.fillStyle = isDark ? 'rgba(255,200,60,0.92)' : 'rgba(200,140,0,0.9)';
+        const bx = p.bx*W, by = p.by*H, bw = p.bw*W;
+        ctx.fillRect(bx, by - H*0.065, bw, H*0.055);
+        ctx.fillStyle = isDark ? '#111' : '#fff';
+        ctx.font = `bold ${Math.max(6, W*0.011)}px monospace`;
+        ctx.textAlign = 'center';
+        ctx.fillText(`ID:${pi+1}`, bx + bw/2, by - H*0.02);
+        ctx.globalAlpha = 1;
+      }
+
+      if (stage === 4) {
+        // Reconstruct: show removed region being filled
+        drawPlayer(W, H, p, 'removed', staggerT, 0, 0);
+        // Scan line sweeping across each removed region
+        const scanX = p.bx*W + staggerT * p.bw*W * 1.2;
+        const scanGrad = ctx.createLinearGradient(scanX-8, 0, scanX+8, 0);
+        const scanCol = isDark ? 'rgba(80,255,150,0.5)' : 'rgba(30,180,80,0.5)';
+        scanGrad.addColorStop(0, 'transparent'); scanGrad.addColorStop(0.5, scanCol); scanGrad.addColorStop(1, 'transparent');
+        ctx.strokeStyle = scanGrad; ctx.lineWidth = 1.2; ctx.globalAlpha = staggerT;
+        const py0 = p.by*H - H*0.03, pyH = p.by*H + p.bh*H + H*0.03;
+        ctx.beginPath(); ctx.moveTo(scanX, py0); ctx.lineTo(scanX, pyH); ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+    });
+
+    // Stage label bar at bottom
+    const barH = Math.max(18, H * 0.16);
+    const barY = H - barH;
+    ctx.fillStyle = isDark ? 'rgba(0,0,0,0.55)' : 'rgba(0,0,0,0.35)';
+    ctx.fillRect(0, barY, W, barH);
+
+    const segW = W / stages.length;
+    stages.forEach((label, i) => {
+      const isActive = i === stage;
+      const isPast   = i < stage;
+      const cx = segW * i + segW / 2;
+      const cy = barY + barH / 2;
+
+      // Connector line
+      if (i < stages.length - 1) {
+        ctx.strokeStyle = isPast
+          ? (isDark ? 'rgba(80,220,120,0.6)' : 'rgba(30,160,80,0.6)')
+          : lineCol;
+        ctx.lineWidth = 0.8;
+        ctx.beginPath(); ctx.moveTo(cx + segW*0.28, cy); ctx.lineTo(cx + segW*0.72, cy); ctx.stroke();
+      }
+
+      // Node circle
+      const r = Math.max(4, W * 0.012);
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2);
+      if (isActive) {
+        ctx.fillStyle = isDark ? '#4ade80' : '#16a34a';
+        // Pulse ring
+        const pulse = 1 + 0.4 * Math.sin(t * 0.12);
+        ctx.globalAlpha = 0.3;
+        ctx.arc(cx, cy, r * pulse * 1.8, 0, Math.PI*2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2);
+        ctx.fillStyle = isDark ? '#4ade80' : '#16a34a';
+      } else if (isPast) {
+        ctx.fillStyle = isDark ? 'rgba(74,222,128,0.45)' : 'rgba(22,163,74,0.4)';
+      } else {
+        ctx.fillStyle = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.2)';
+      }
+      ctx.fill();
+
+      // Label
+      ctx.fillStyle = isActive
+        ? (isDark ? '#4ade80' : '#16a34a')
+        : (isPast ? (isDark ? 'rgba(74,222,128,0.7)' : 'rgba(22,163,74,0.6)') : (isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)'));
+      ctx.font = `${isActive ? '600' : '400'} ${Math.max(7, W * 0.0115)}px monospace`;
+      ctx.textAlign = 'center';
+      ctx.fillText(label, cx, barY + barH * 0.88);
+    });
+
+    // Top-right: frame counter / stage info
+    ctx.fillStyle = isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.25)';
+    ctx.font = `${Math.max(7, W*0.011)}px monospace`;
+    ctx.textAlign = 'right';
+    ctx.fillText(`frame ${String(t % 9999).padStart(4,'0')}`, W - 8, 14);
+
     t++; requestAnimationFrame(draw);
   }
   draw();
 }
 
-/* ── ReachlyEngine: particle mesh ── */
+/* ── ReachlyEngine ── */
 function initReachly() {
   const canvas = document.getElementById('cv-reachly');
   if (!canvas) return;
@@ -1076,220 +1528,63 @@ function initReachly() {
   draw();
 }
 
-/* ── Mesh: resilient offline mesh network visualization ── */
+/* ── Mesh ── */
 function initMesh() {
   const canvas = document.getElementById('cv-mesh');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
   resize(); window.addEventListener('resize', resize);
-
-  // Nodes: offline peer nodes + 1 gateway that joins later
   const NODE_COUNT = 7;
   let t = 0;
-  const GATEWAY_JOIN = 180; // frames until gateway appears
-
+  const GATEWAY_JOIN = 180;
   function makeNodes(W, H) {
-    // Fixed positions in a scattered cluster
-    const positions = [
-      {x:0.18,y:0.28},{x:0.38,y:0.18},{x:0.55,y:0.35},{x:0.72,y:0.22},
-      {x:0.28,y:0.65},{x:0.50,y:0.72},{x:0.68,y:0.60}
-    ];
-    return positions.map((p,i) => ({
-      x: W*p.x, y: H*p.y,
-      id: `N${String(i+1).padStart(2,'0')}`,
-      phase: i*0.7,
-      known: new Set([i]) // which node IDs this node knows about
-    }));
+    const positions = [{x:0.18,y:0.28},{x:0.38,y:0.18},{x:0.55,y:0.35},{x:0.72,y:0.22},{x:0.28,y:0.65},{x:0.50,y:0.72},{x:0.68,y:0.60}];
+    return positions.map((p,i) => ({x:W*p.x,y:H*p.y,id:`N${String(i+1).padStart(2,'0')}`,phase:i*0.7,known:new Set([i])}));
   }
-
-  // Gateway node (internet-connected, joins later)
-  function getGateway(W, H) {
-    return { x: W*0.90, y: H*0.48, id: 'GW', isGateway: true };
-  }
-
-  // Mesh edges (which nodes are adjacent)
+  function getGateway(W, H) { return { x: W*0.90, y: H*0.48, id: 'GW', isGateway: true }; }
   const edgePairs = [[0,1],[1,2],[2,3],[0,4],[4,5],[5,6],[2,5],[1,4],[3,6]];
-
-  // Ping particles (peer → peer)
   class PingParticle {
-    constructor(fromIdx, toIdx) {
-      this.from = fromIdx; this.to = toIdx;
-      this.t = Math.random(); this.speed = 0.006 + Math.random()*0.004;
-      this.alive = true;
-    }
-    update() { this.t += this.speed; if (this.t > 1) this.alive = false; }
+    constructor(fromIdx, toIdx) { this.from=fromIdx; this.to=toIdx; this.t=Math.random(); this.speed=0.006+Math.random()*0.004; this.alive=true; }
+    update() { this.t+=this.speed; if(this.t>1) this.alive=false; }
   }
-  // Gateway upload particles
   class UploadParticle {
-    constructor(fromIdx, nodes, gw) {
-      this.fromIdx = fromIdx; this.nodes = nodes; this.gw = gw;
-      this.t = 0; this.speed = 0.007 + Math.random()*0.004;
-    }
-    update() { this.t += this.speed; return this.t <= 1; }
-    pos() {
-      const from = this.nodes[this.fromIdx];
-      return { x: from.x + (this.gw.x-from.x)*this.t, y: from.y + (this.gw.y-from.y)*this.t };
-    }
+    constructor(fromIdx, nodes, gw) { this.fromIdx=fromIdx; this.nodes=nodes; this.gw=gw; this.t=0; this.speed=0.007+Math.random()*0.004; }
+    update() { this.t+=this.speed; return this.t<=1; }
+    pos() { const from=this.nodes[this.fromIdx]; return{x:from.x+(this.gw.x-from.x)*this.t,y:from.y+(this.gw.y-from.y)*this.t}; }
   }
-
-  let pingParticles = [];
-  let uploadParticles = [];
-  let gatewayVisible = false;
-  let gatewayPulse = 0;
-  let publishDone = false;
-
-  // Spawn pings periodically
-  let pingTimer = 0;
-
+  let pingParticles=[], uploadParticles=[], gatewayVisible=false, gatewayPulse=0, publishDone=false, pingTimer=0;
   function draw() {
-    const W = canvas.width, H = canvas.height;
+    const W=canvas.width,H=canvas.height;
     ctx.clearRect(0,0,W,H);
-    const nodes = makeNodes(W,H);
-    const gw = getGateway(W,H);
-    const lineCol = getCSSVar('--canvas-line');
-    const dotCol  = getCSSVar('--canvas-dot');
-    const surf2   = getCSSVar('--surface2');
-    const isDark  = html.dataset.theme === 'dark';
-
-    // Gateway joins after GATEWAY_JOIN frames
-    if (t > GATEWAY_JOIN) gatewayVisible = true;
-
-    // Spawn ping particles between mesh nodes
+    const nodes=makeNodes(W,H),gw=getGateway(W,H);
+    const lineCol=getCSSVar('--canvas-line'),dotCol=getCSSVar('--canvas-dot'),surf2=getCSSVar('--surface2');
+    const isDark=html.dataset.theme==='dark';
+    if(t>GATEWAY_JOIN) gatewayVisible=true;
     pingTimer++;
-    if (pingTimer % 18 === 0) {
-      const e = edgePairs[Math.floor(Math.random()*edgePairs.length)];
-      pingParticles.push(new PingParticle(e[0],e[1]));
-      if (Math.random()>0.5) pingParticles.push(new PingParticle(e[1],e[0]));
-    }
-
-    // Once gateway visible, spawn upload particles from each node to GW
-    if (gatewayVisible && !publishDone) {
-      if (t % 22 === 0) {
-        const idx = Math.floor(Math.random()*NODE_COUNT);
-        uploadParticles.push(new UploadParticle(idx, nodes, gw));
-      }
-      if (t > GATEWAY_JOIN + 120) publishDone = true;
-    }
-
-    // ── Draw mesh edges ──
-    edgePairs.forEach(([a,b]) => {
-      ctx.strokeStyle = lineCol; ctx.lineWidth = 0.75;
-      ctx.beginPath(); ctx.moveTo(nodes[a].x,nodes[a].y); ctx.lineTo(nodes[b].x,nodes[b].y); ctx.stroke();
-    });
-
-    // ── Draw gateway connection edges (when visible) ──
-    if (gatewayVisible) {
-      nodes.forEach((n,i) => {
-        // Connect gateway to nearest nodes
-        if ([2,5,6].includes(i)) {
-          ctx.strokeStyle = isDark ? 'rgba(74,222,128,0.18)' : 'rgba(22,163,74,0.18)';
-          ctx.lineWidth = 0.75; ctx.setLineDash([3,4]);
-          ctx.beginPath(); ctx.moveTo(n.x,n.y); ctx.lineTo(gw.x,gw.y); ctx.stroke();
-          ctx.setLineDash([]);
-        }
-      });
-    }
-
-    // ── Update & draw ping particles ──
-    pingParticles = pingParticles.filter(p => p.alive);
-    pingParticles.forEach(p => {
-      p.update();
-      const from = nodes[p.from], to = nodes[p.to];
-      const px = from.x + (to.x-from.x)*p.t;
-      const py = from.y + (to.y-from.y)*p.t;
-      ctx.globalAlpha = (1-p.t)*0.8;
-      ctx.fillStyle = dotCol;
-      ctx.beginPath(); ctx.arc(px,py,2,0,Math.PI*2); ctx.fill();
-      ctx.globalAlpha = 1;
-    });
-
-    // ── Update & draw upload particles ──
-    if (gatewayVisible) {
-      uploadParticles = uploadParticles.filter(p => p.update());
-      uploadParticles.forEach(p => {
-        const pos = p.pos();
-        ctx.globalAlpha = (1-p.t)*0.9;
-        ctx.fillStyle = isDark ? '#4ade80' : '#16a34a';
-        ctx.beginPath(); ctx.arc(pos.x,pos.y,2.2,0,Math.PI*2); ctx.fill();
-        ctx.globalAlpha = 1;
-      });
-    }
-
-    // ── Draw mesh nodes ──
-    nodes.forEach((n,i) => {
-      const pulse = 1 + 0.12*Math.sin(t*0.035+n.phase);
-      const r = 4.5 * pulse;
-      ctx.fillStyle = surf2; ctx.strokeStyle = lineCol; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.arc(n.x,n.y,r,0,Math.PI*2); ctx.fill(); ctx.stroke();
-      // node dot
-      ctx.fillStyle = dotCol; ctx.globalAlpha = 0.65;
-      ctx.beginPath(); ctx.arc(n.x,n.y,1.5,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1;
-      // node ID label (tiny)
-      ctx.fillStyle = dotCol; ctx.globalAlpha = 0.4;
-      ctx.font = '7px monospace'; ctx.textAlign='center';
-      ctx.fillText(n.id, n.x, n.y-8); ctx.globalAlpha=1;
-    });
-
-    // ── Draw gateway node ──
-    if (gatewayVisible) {
-      gatewayPulse = Math.min(gatewayPulse+0.04, 1);
-      const gpulse = 1 + 0.18*Math.sin(t*0.05);
-      const gr = 7 * gpulse * gatewayPulse;
-
-      // Glow ring
-      const glowGrad = ctx.createRadialGradient(gw.x,gw.y,0,gw.x,gw.y,gr*3);
-      glowGrad.addColorStop(0, isDark ? 'rgba(74,222,128,0.12)' : 'rgba(22,163,74,0.10)');
-      glowGrad.addColorStop(1, 'transparent');
-      ctx.fillStyle = glowGrad; ctx.globalAlpha = gatewayPulse;
-      ctx.beginPath(); ctx.arc(gw.x,gw.y,gr*3,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1;
-
-      // Node body
-      ctx.fillStyle = surf2;
-      ctx.strokeStyle = isDark ? 'rgba(74,222,128,0.6)' : 'rgba(22,163,74,0.6)';
-      ctx.lineWidth = 1.5; ctx.globalAlpha = gatewayPulse;
-      ctx.beginPath(); ctx.arc(gw.x,gw.y,gr,0,Math.PI*2); ctx.fill(); ctx.stroke();
-      // Center dot
-      ctx.fillStyle = isDark ? '#4ade80' : '#16a34a';
-      ctx.globalAlpha = 0.85 * gatewayPulse;
-      ctx.beginPath(); ctx.arc(gw.x,gw.y,2.5,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1;
-      // Label
-      ctx.fillStyle = isDark ? '#4ade80' : '#16a34a';
-      ctx.globalAlpha = 0.7 * gatewayPulse;
-      ctx.font = '7px monospace'; ctx.textAlign='center';
-      ctx.fillText('GW', gw.x, gw.y-10);
-      ctx.font = '6px monospace'; ctx.fillText('ONLINE', gw.x, gw.y+14);
-      ctx.globalAlpha=1;
-    }
-
-    // ── Internet signal lines from gateway (after publish) ──
-    if (publishDone) {
-      const alpha = 0.12 + 0.05*Math.sin(t*0.06);
-      for (let i=1;i<=3;i++) {
-        const rad = i*22 + 4*Math.sin(t*0.03+i);
-        ctx.strokeStyle = isDark ? `rgba(74,222,128,${alpha})` : `rgba(22,163,74,${alpha*0.8})`;
-        ctx.lineWidth = 0.8;
-        ctx.beginPath(); ctx.arc(gw.x,gw.y,rad,0,Math.PI*2); ctx.stroke();
-      }
-    }
-
-    t++; requestAnimationFrame(draw);
+    if(pingTimer%18===0){const e=edgePairs[Math.floor(Math.random()*edgePairs.length)];pingParticles.push(new PingParticle(e[0],e[1]));if(Math.random()>0.5)pingParticles.push(new PingParticle(e[1],e[0]));}
+    if(gatewayVisible&&!publishDone){if(t%22===0){const idx=Math.floor(Math.random()*NODE_COUNT);uploadParticles.push(new UploadParticle(idx,nodes,gw));}if(t>GATEWAY_JOIN+120)publishDone=true;}
+    edgePairs.forEach(([a,b])=>{ctx.strokeStyle=lineCol;ctx.lineWidth=0.75;ctx.beginPath();ctx.moveTo(nodes[a].x,nodes[a].y);ctx.lineTo(nodes[b].x,nodes[b].y);ctx.stroke();});
+    if(gatewayVisible){nodes.forEach((n,i)=>{if([2,5,6].includes(i)){ctx.strokeStyle=isDark?'rgba(74,222,128,0.18)':'rgba(22,163,74,0.18)';ctx.lineWidth=0.75;ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(n.x,n.y);ctx.lineTo(gw.x,gw.y);ctx.stroke();ctx.setLineDash([]); }});}
+    pingParticles=pingParticles.filter(p=>p.alive);
+    pingParticles.forEach(p=>{p.update();const from=nodes[p.from],to=nodes[p.to];const px=from.x+(to.x-from.x)*p.t,py=from.y+(to.y-from.y)*p.t;ctx.globalAlpha=(1-p.t)*0.8;ctx.fillStyle=dotCol;ctx.beginPath();ctx.arc(px,py,2,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;});
+    if(gatewayVisible){uploadParticles=uploadParticles.filter(p=>p.update());uploadParticles.forEach(p=>{const pos=p.pos();ctx.globalAlpha=(1-p.t)*0.9;ctx.fillStyle=isDark?'#4ade80':'#16a34a';ctx.beginPath();ctx.arc(pos.x,pos.y,2.2,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;});}
+    nodes.forEach((n,i)=>{const pulse=1+0.12*Math.sin(t*0.035+n.phase);const r=4.5*pulse;ctx.fillStyle=surf2;ctx.strokeStyle=lineCol;ctx.lineWidth=1;ctx.beginPath();ctx.arc(n.x,n.y,r,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle=dotCol;ctx.globalAlpha=0.65;ctx.beginPath();ctx.arc(n.x,n.y,1.5,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;ctx.fillStyle=dotCol;ctx.globalAlpha=0.4;ctx.font='7px monospace';ctx.textAlign='center';ctx.fillText(n.id,n.x,n.y-8);ctx.globalAlpha=1;});
+    if(gatewayVisible){gatewayPulse=Math.min(gatewayPulse+0.04,1);const gpulse=1+0.18*Math.sin(t*0.05);const gr=7*gpulse*gatewayPulse;const glowGrad=ctx.createRadialGradient(gw.x,gw.y,0,gw.x,gw.y,gr*3);glowGrad.addColorStop(0,isDark?'rgba(74,222,128,0.12)':'rgba(22,163,74,0.10)');glowGrad.addColorStop(1,'transparent');ctx.fillStyle=glowGrad;ctx.globalAlpha=gatewayPulse;ctx.beginPath();ctx.arc(gw.x,gw.y,gr*3,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;ctx.fillStyle=surf2;ctx.strokeStyle=isDark?'rgba(74,222,128,0.6)':'rgba(22,163,74,0.6)';ctx.lineWidth=1.5;ctx.globalAlpha=gatewayPulse;ctx.beginPath();ctx.arc(gw.x,gw.y,gr,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle=isDark?'#4ade80':'#16a34a';ctx.globalAlpha=0.85*gatewayPulse;ctx.beginPath();ctx.arc(gw.x,gw.y,2.5,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;ctx.fillStyle=isDark?'#4ade80':'#16a34a';ctx.globalAlpha=0.7*gatewayPulse;ctx.font='7px monospace';ctx.textAlign='center';ctx.fillText('GW',gw.x,gw.y-10);ctx.font='6px monospace';ctx.fillText('ONLINE',gw.x,gw.y+14);ctx.globalAlpha=1;}
+    if(publishDone){const alpha=0.12+0.05*Math.sin(t*0.06);for(let i=1;i<=3;i++){const rad=i*22+4*Math.sin(t*0.03+i);ctx.strokeStyle=isDark?`rgba(74,222,128,${alpha})`:`rgba(22,163,74,${alpha*0.8})`;ctx.lineWidth=0.8;ctx.beginPath();ctx.arc(gw.x,gw.y,rad,0,Math.PI*2);ctx.stroke();}}
+    t++;requestAnimationFrame(draw);
   }
   draw();
 }
 
-/* ── XGestura: oscilloscope signal waves ── */
+/* ── XGestura ── */
 function initXGestura() {
   const canvas = document.getElementById('cv-xgestura');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
   resize(); window.addEventListener('resize', resize);
-  const channels = [
-    {freq:0.018,amp:0.28,phase:0},
-    {freq:0.024,amp:0.20,phase:2.1},
-    {freq:0.013,amp:0.16,phase:4.3},
-  ];
+  const channels = [{freq:0.018,amp:0.28,phase:0},{freq:0.024,amp:0.20,phase:2.1},{freq:0.013,amp:0.16,phase:4.3}];
   let t = 0;
   function draw() {
     const W = canvas.width, H = canvas.height;
@@ -1314,15 +1609,13 @@ function initXGestura() {
     grad.addColorStop(0,'transparent'); grad.addColorStop(1,dotCol);
     ctx.strokeStyle=grad; ctx.lineWidth=1; ctx.globalAlpha=0.5;
     ctx.beginPath();ctx.moveTo(curX,0);ctx.lineTo(curX,H);ctx.stroke();ctx.globalAlpha=1;
-    [0.16,0.33,0.5,0.66,0.83].forEach(xf=>{
-      [0.25,0.5,0.75].forEach(yf=>{ ctx.fillStyle=lineCol; ctx.fillRect(W*xf-1,H*yf-1,2,2); });
-    });
-    t++; requestAnimationFrame(draw);
+    [0.16,0.33,0.5,0.66,0.83].forEach(xf=>{[0.25,0.5,0.75].forEach(yf=>{ctx.fillStyle=lineCol;ctx.fillRect(W*xf-1,H*yf-1,2,2);});});
+    t++;requestAnimationFrame(draw);
   }
   draw();
 }
 
-/* ── ExamCell: flowing workflow pipeline DAG ── */
+/* ── ExamCell ── */
 function initExamCell() {
   const canvas = document.getElementById('cv-examcell');
   if (!canvas) return;
@@ -1330,11 +1623,8 @@ function initExamCell() {
   function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
   resize(); window.addEventListener('resize', resize);
   function getNodes() {
-    const W = canvas.width, H = canvas.height;
-    return [
-      {x:W*0.08,y:H*0.5},{x:W*0.28,y:H*0.25},{x:W*0.28,y:H*0.75},
-      {x:W*0.55,y:H*0.25},{x:W*0.55,y:H*0.75},{x:W*0.78,y:H*0.5},{x:W*0.95,y:H*0.5},
-    ];
+    const W=canvas.width,H=canvas.height;
+    return [{x:W*0.08,y:H*0.5},{x:W*0.28,y:H*0.25},{x:W*0.28,y:H*0.75},{x:W*0.55,y:H*0.25},{x:W*0.55,y:H*0.75},{x:W*0.78,y:H*0.5},{x:W*0.95,y:H*0.5}];
   }
   const edgeIdx=[[0,1],[0,2],[1,3],[2,4],[3,5],[4,5],[5,6]];
   class FlowParticle {
@@ -1350,19 +1640,8 @@ function initExamCell() {
     const nodes=getNodes();
     const lineCol=getCSSVar('--canvas-line'),dotCol=getCSSVar('--canvas-dot');
     edgeIdx.forEach(([a,b])=>{ctx.strokeStyle=lineCol;ctx.lineWidth=0.75;ctx.beginPath();ctx.moveTo(nodes[a].x,nodes[a].y);ctx.lineTo(nodes[b].x,nodes[b].y);ctx.stroke();});
-    particles.forEach(p=>{
-      p.update();
-      const from=nodes[p.from],to=nodes[p.to];
-      const px=from.x+(to.x-from.x)*p.t,py=from.y+(to.y-from.y)*p.t;
-      ctx.fillStyle=dotCol;ctx.globalAlpha=0.75;ctx.beginPath();ctx.arc(px,py,1.8,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
-    });
-    nodes.forEach((n,i)=>{
-      const pulse=1+0.12*Math.sin(t*0.03+i*0.9);
-      const r=(i===0||i===6?5:4)*pulse;
-      ctx.fillStyle=getCSSVar('--surface2');ctx.strokeStyle=lineCol;ctx.lineWidth=0.75;
-      ctx.beginPath();ctx.arc(n.x,n.y,r,0,Math.PI*2);ctx.fill();ctx.stroke();
-      ctx.fillStyle=dotCol;ctx.globalAlpha=0.55;ctx.beginPath();ctx.arc(n.x,n.y,1.5,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
-    });
+    particles.forEach(p=>{p.update();const from=nodes[p.from],to=nodes[p.to];const px=from.x+(to.x-from.x)*p.t,py=from.y+(to.y-from.y)*p.t;ctx.fillStyle=dotCol;ctx.globalAlpha=0.75;ctx.beginPath();ctx.arc(px,py,1.8,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;});
+    nodes.forEach((n,i)=>{const pulse=1+0.12*Math.sin(t*0.03+i*0.9);const r=(i===0||i===6?5:4)*pulse;ctx.fillStyle=getCSSVar('--surface2');ctx.strokeStyle=lineCol;ctx.lineWidth=0.75;ctx.beginPath();ctx.arc(n.x,n.y,r,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle=dotCol;ctx.globalAlpha=0.55;ctx.beginPath();ctx.arc(n.x,n.y,1.5,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;});
     t++;requestAnimationFrame(draw);
   }
   draw();
