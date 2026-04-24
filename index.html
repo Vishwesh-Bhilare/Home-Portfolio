@@ -5,181 +5,183 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Vishwesh Bhilare — Computer Engineer</title>
   <meta name="description" content="Computer Engineering undergrad at MMCOE, Pune. Building at the intersection of systems, software, and hardware." />
-
-  <!-- OG -->
   <meta property="og:title" content="Vishwesh Bhilare" />
   <meta property="og:description" content="Computer Engineering undergrad. Embedded systems, local AI, and video processing." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://vishwesh.vercel.app" />
+  <meta property="og:url" content="https://vishweshbh.in" />
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="Vishwesh Bhilare" />
   <meta name="twitter:description" content="Computer Engineering undergrad. Embedded systems, local AI, and video processing." />
+
+  <!-- SVG Favicon: VB monogram -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0a'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%23f0f0f0' font-family='system-ui,sans-serif' font-weight='700' font-size='14' letter-spacing='-1'%3EVB%3C/text%3E%3C/svg%3E" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;1,14..32,300&display=swap" rel="stylesheet">
 
   <style>
+/* ─── CUSTOM CURSOR ─── */
+*, *::before, *::after { cursor: none !important; box-sizing: border-box; margin: 0; padding: 0; }
+
+#cursor-ring {
+  position: fixed; width: 28px; height: 28px;
+  border: 1.5px solid var(--cursor-color, rgba(240,240,240,0.45));
+  border-radius: 50%; pointer-events: none; z-index: 99999;
+  transform: translate(-50%, -50%);
+  transition: width 0.22s cubic-bezier(.22,1,.36,1), height 0.22s cubic-bezier(.22,1,.36,1),
+              border-color 0.2s ease, background 0.2s ease, opacity 0.2s ease;
+  will-change: transform; mix-blend-mode: difference;
+  left: -100px; top: -100px;
+}
+#cursor-dot {
+  position: fixed; width: 4px; height: 4px;
+  background: var(--cursor-dot-color, #f0f0f0);
+  border-radius: 50%; pointer-events: none; z-index: 100000;
+  transform: translate(-50%, -50%);
+  transition: transform 0.08s ease, opacity 0.15s ease;
+  will-change: transform; left: -100px; top: -100px;
+}
+body.cursor-hover #cursor-ring { width: 44px; height: 44px; border-color: rgba(240,240,240,0.7); background: rgba(240,240,240,0.03); }
+body.cursor-click #cursor-ring { width: 18px; height: 18px; }
+body.cursor-text  #cursor-ring { width: 22px; height: 22px; border-style: dashed; }
+
 /* ─── TOKENS ─── */
 [data-theme="dark"] {
-  --bg:        #0a0a0a;
-  --surface:   #111111;
-  --surface2:  #181818;
-  --border:    rgba(255,255,255,0.07);
-  --border2:   rgba(255,255,255,0.12);
-  --text:      #f0f0f0;
-  --sub:       #808080;
-  --muted:     #383838;
-  --tag-bg:    #191919;
-  --blob-a:    rgba(255,255,255,0.11);
-  --blob-b:    rgba(255,255,255,0.05);
-  --canvas-line: rgba(255,255,255,0.18);
-  --canvas-dot:  rgba(255,255,255,0.55);
-  --canvas-glow: rgba(255,255,255,0.08);
+  --bg: #0a0a0a; --surface: #111111; --surface2: #181818;
+  --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.14);
+  --text: #f0f0f0; --sub: #888888; --muted: #404040;
+  --tag-bg: #191919; --blob-a: rgba(255,255,255,0.10); --blob-b: rgba(255,255,255,0.04);
+  --canvas-line: rgba(255,255,255,0.18); --canvas-dot: rgba(255,255,255,0.6);
+  --progress-bar: rgba(255,255,255,0.55); --clickable-glow: rgba(255,255,255,0.035);
+  --cursor-color: rgba(240,240,240,0.45); --cursor-dot-color: #f0f0f0;
+  --focus-ring: rgba(255,255,255,0.5);
 }
 [data-theme="light"] {
-  --bg:        #f7f7f5;
-  --surface:   #ffffff;
-  --surface2:  #f0f0ee;
-  --border:    rgba(0,0,0,0.08);
-  --border2:   rgba(0,0,0,0.15);
-  --text:      #0d0d0d;
-  --sub:       #666666;
-  --muted:     #c8c8c8;
-  --tag-bg:    #efefed;
-  --blob-a:    rgba(0,0,0,0.05);
-  --blob-b:    rgba(0,0,0,0.025);
-  --canvas-line: rgba(0,0,0,0.12);
-  --canvas-dot:  rgba(0,0,0,0.4);
-  --canvas-glow: rgba(0,0,0,0.05);
+  --bg: #f7f7f5; --surface: #ffffff; --surface2: #f0f0ee;
+  --border: rgba(0,0,0,0.08); --border2: rgba(0,0,0,0.18);
+  --text: #0d0d0d; --sub: #666666; --muted: #bbb;
+  --tag-bg: #efefed; --blob-a: rgba(0,0,0,0.04); --blob-b: rgba(0,0,0,0.02);
+  --canvas-line: rgba(0,0,0,0.12); --canvas-dot: rgba(0,0,0,0.45);
+  --progress-bar: rgba(0,0,0,0.45); --clickable-glow: rgba(0,0,0,0.025);
+  --cursor-color: rgba(13,13,13,0.45); --cursor-dot-color: #0d0d0d;
+  --focus-ring: rgba(0,0,0,0.45);
 }
 
-/* ─── RESET ─── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* ─── FOCUS ─── */
+:focus-visible {
+  outline: 1.5px solid var(--focus-ring);
+  outline-offset: 3px; border-radius: 4px;
+}
+
 html { height: 100%; }
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  height: 100%;
-  display: flex;
-  overflow: hidden;
+  background: var(--bg); color: var(--text);
+  height: 100%; display: flex; overflow: hidden;
   transition: background 0.3s, color 0.3s;
   -webkit-font-smoothing: antialiased;
 }
 
+/* ─── SCROLL PROGRESS ─── */
+#scroll-progress {
+  position: fixed; top: 0; left: 0;
+  height: 2px; width: 0%;
+  background: var(--progress-bar); z-index: 9000;
+  transition: width 0.06s linear; opacity: 0;
+  pointer-events: none;
+}
+#scroll-progress.active { opacity: 1; }
+
 /* ─── BLOBS ─── */
-.blob-wrap {
-  position: fixed; inset: 0;
-  pointer-events: none; z-index: 0; overflow: hidden;
-}
-.blob {
-  position: absolute; border-radius: 50%;
-  filter: blur(120px); will-change: transform;
-}
-.blob-1 {
-  width: 700px; height: 700px;
-  top: -200px; left: -160px;
-  background: var(--blob-a);
-  animation: blob1 20s ease-in-out infinite alternate;
-}
-.blob-2 {
-  width: 480px; height: 480px;
-  bottom: -100px; right: 8%;
-  background: var(--blob-b);
-  animation: blob2 26s ease-in-out infinite alternate;
-}
-.blob-3 {
-  width: 300px; height: 300px;
-  top: 40%; left: 50%;
-  background: var(--blob-b);
-  animation: blob3 32s ease-in-out infinite alternate;
-}
-@keyframes blob1 {
-  0%   { transform: translate(0,0) scale(1); }
-  33%  { transform: translate(60px, 40px) scale(1.06); }
-  66%  { transform: translate(20px, 80px) scale(0.97); }
-  100% { transform: translate(80px, 30px) scale(1.04); }
-}
-@keyframes blob2 {
-  0%   { transform: translate(0,0) scale(1); }
-  40%  { transform: translate(-50px,-60px) scale(1.08); }
-  70%  { transform: translate(-80px,-20px) scale(0.95); }
-  100% { transform: translate(-30px,-80px) scale(1.05); }
-}
-@keyframes blob3 {
-  0%   { transform: translate(0,0) scale(1); }
-  50%  { transform: translate(40px,-60px) scale(1.1); }
-  100% { transform: translate(-40px,40px) scale(0.9); }
-}
+.blob-wrap { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.blob { position: absolute; border-radius: 50%; filter: blur(120px); will-change: transform; }
+.blob-1 { width: 700px; height: 700px; top: -200px; left: -160px; background: var(--blob-a); animation: blob1 20s ease-in-out infinite alternate; }
+.blob-2 { width: 480px; height: 480px; bottom: -100px; right: 8%; background: var(--blob-b); animation: blob2 26s ease-in-out infinite alternate; }
+.blob-3 { width: 300px; height: 300px; top: 40%; left: 50%; background: var(--blob-b); animation: blob3 32s ease-in-out infinite alternate; }
+@keyframes blob1 { 0%{transform:translate(0,0) scale(1)} 33%{transform:translate(60px,40px) scale(1.06)} 66%{transform:translate(20px,80px) scale(0.97)} 100%{transform:translate(80px,30px) scale(1.04)} }
+@keyframes blob2 { 0%{transform:translate(0,0) scale(1)} 40%{transform:translate(-50px,-60px) scale(1.08)} 70%{transform:translate(-80px,-20px) scale(0.95)} 100%{transform:translate(-30px,-80px) scale(1.05)} }
+@keyframes blob3 { 0%{transform:translate(0,0) scale(1)} 50%{transform:translate(40px,-60px) scale(1.1)} 100%{transform:translate(-40px,40px) scale(0.9)} }
 
 /* ─── SIDEBAR ─── */
 .sidebar {
   position: relative; z-index: 10;
-  width: 216px; flex-shrink: 0;
-  height: 100vh;
+  width: 220px; flex-shrink: 0; height: 100vh;
   border-right: 1px solid var(--border);
   display: flex; flex-direction: column;
   padding: 36px 22px;
   background: var(--surface);
   transition: background 0.3s, border-color 0.3s;
 }
-.sidebar-name { font-size: 13px; font-weight: 600; letter-spacing: -0.01em; color: var(--text); margin-bottom: 3px; }
-.sidebar-role { font-size: 11px; color: var(--sub); margin-bottom: 38px; }
+.sidebar-name { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; color: var(--text); margin-bottom: 3px; }
+.sidebar-role { font-size: 12px; color: var(--sub); margin-bottom: 38px; }
 
 .status {
   display: inline-flex; align-items: center; gap: 6px;
-  font-size: 10px; color: var(--sub);
+  font-size: 11px; color: var(--sub);
   margin-bottom: 38px; margin-top: -28px;
 }
-.status-dot {
-  width: 5px; height: 5px; border-radius: 50%;
-  background: #4ade80;
-  animation: blink 2.5s ease infinite;
-}
+.status-dot { width: 5px; height: 5px; border-radius: 50%; background: #4ade80; animation: blink 2.5s ease infinite; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
 
 nav { display: flex; flex-direction: column; gap: 1px; }
 .tab {
   display: flex; align-items: center; gap: 9px;
-  padding: 8px 10px; border-radius: 5px;
-  font-size: 13px; font-weight: 400;
-  color: var(--sub); cursor: pointer;
-  border: none; background: none;
+  padding: 9px 10px; border-radius: 5px;
+  font-size: 13.5px; font-weight: 400;
+  color: var(--sub); cursor: none; border: none; background: none;
   text-align: left; width: 100%;
   transition: background 0.15s, color 0.15s;
   letter-spacing: -0.005em;
+  position: relative;
 }
-.tab:hover { background: var(--tag-bg); color: var(--text); }
+.tab:hover { background: var(--clickable-glow); color: var(--text); }
 .tab.active { background: var(--tag-bg); color: var(--text); font-weight: 500; }
-.tab-dot {
-  width: 4px; height: 4px; border-radius: 50%;
-  background: var(--muted); flex-shrink: 0;
-  transition: background 0.15s;
-}
+.tab-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--muted); flex-shrink: 0; transition: background 0.15s; }
 .tab.active .tab-dot { background: var(--text); }
 
-.sidebar-bottom {
-  margin-top: auto;
-  display: flex; flex-direction: column; gap: 16px;
+/* Keyboard shortcut badge */
+.tab-key {
+  margin-left: auto; font-size: 10px; color: var(--muted);
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 3px; padding: 1px 5px;
+  opacity: 0; transition: opacity 0.15s;
+  font-family: monospace;
 }
+body.show-keys .tab-key { opacity: 1; }
+
+.sidebar-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 16px; }
 .sidebar-links { display: flex; flex-direction: column; gap: 4px; }
 .sidebar-link {
-  font-size: 11px; color: var(--sub);
-  text-decoration: none; padding: 3px 10px;
-  transition: color 0.15s; border-radius: 3px;
+  font-size: 12px; color: var(--sub);
+  text-decoration: none; padding: 4px 10px;
+  transition: color 0.15s, background 0.15s; border-radius: 3px;
+  display: inline-flex; align-items: center; gap: 4px;
 }
-.sidebar-link:hover { color: var(--text); }
+.sidebar-link:hover { color: var(--text); background: var(--clickable-glow); }
+.sidebar-link::after { content: '↗'; font-size: 10px; opacity: 0.6; }
 
 .toggle {
   display: flex; align-items: center; gap: 8px;
-  padding: 7px 10px; border-radius: 5px;
+  padding: 8px 10px; border-radius: 5px;
   border: 1px solid var(--border);
   background: none; color: var(--sub);
-  font-size: 11px; font-family: inherit;
-  cursor: pointer; transition: all 0.15s;
+  font-size: 12px; font-family: inherit;
+  cursor: none; transition: all 0.15s;
 }
-.toggle:hover { color: var(--text); background: var(--tag-bg); }
+.toggle:hover { color: var(--text); background: var(--clickable-glow); border-color: var(--border2); }
+
+/* ─── SKIP LINK ─── */
+.skip-link {
+  position: fixed; top: -100px; left: 50%;
+  transform: translateX(-50%); z-index: 99998;
+  background: var(--surface); color: var(--text);
+  padding: 10px 20px; border-radius: 6px;
+  border: 1px solid var(--border2);
+  font-size: 13px; text-decoration: none;
+  transition: top 0.2s;
+}
+.skip-link:focus { top: 12px; }
 
 /* ─── MAIN ─── */
 main {
@@ -190,75 +192,45 @@ main {
 main::-webkit-scrollbar { width: 3px; }
 main::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
 
+/* ─── PANEL TRANSITIONS ─── */
 .panel {
   display: none;
-  padding: 60px 68px 100px;
-  max-width: 820px;
-  animation: panelIn 0.25s ease;
+  padding: 62px 72px 100px;
+  max-width: 840px;
 }
 .panel.active { display: block; }
-@keyframes panelIn {
-  from { opacity: 0; transform: translateY(7px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+.panel.slide-in  { animation: slideIn 0.28s cubic-bezier(.22,1,.36,1); }
+.panel.slide-out { animation: slideOut 0.18s ease; }
+@keyframes slideIn { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes slideOut { from { opacity: 1; } to { opacity: 0; } }
 
-/* ─── TYPE ─── */
+/* ─── TYPOGRAPHY ─── */
 .eyebrow {
-  font-size: 10px; font-weight: 500;
+  font-size: 10.5px; font-weight: 500;
   letter-spacing: 0.1em; text-transform: uppercase;
   color: var(--muted); margin-bottom: 20px;
 }
-h1.title {
-  font-size: 36px; font-weight: 600;
-  letter-spacing: -0.03em; line-height: 1.08;
-  color: var(--text); margin-bottom: 12px;
-}
-h2.title {
-  font-size: 26px; font-weight: 600;
-  letter-spacing: -0.025em; line-height: 1.12;
-  color: var(--text); margin-bottom: 10px;
-}
-.subtitle {
-  font-size: 14px; color: var(--sub);
-  line-height: 1.75; font-weight: 400;
-  max-width: 480px; margin-bottom: 48px;
-}
+h1.title { font-size: 38px; font-weight: 600; letter-spacing: -0.03em; line-height: 1.08; color: var(--text); margin-bottom: 12px; }
+h2.title { font-size: 27px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.12; color: var(--text); margin-bottom: 10px; }
+.subtitle { font-size: 14.5px; color: var(--sub); line-height: 1.75; font-weight: 400; max-width: 480px; margin-bottom: 48px; }
 hr.sep { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
-.label {
-  font-size: 10px; font-weight: 500;
-  letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--muted); margin-bottom: 16px;
-}
-p.body {
-  font-size: 14px; line-height: 1.8;
-  color: var(--sub); max-width: 520px;
-}
+.label { font-size: 10.5px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+p.body { font-size: 14.5px; line-height: 1.8; color: var(--sub); max-width: 520px; }
 p.body strong { color: var(--text); font-weight: 500; }
 
-/* ─── PROFILE STATS ─── */
+/* ─── STATS ─── */
 .stat-row { display: flex; gap: 10px; margin-bottom: 36px; flex-wrap: wrap; }
-.stat {
-  flex: 1; min-width: 130px;
-  padding: 18px 18px 16px;
-  border: 1px solid var(--border);
-  border-radius: 7px; background: var(--surface);
-}
-.stat-val { font-size: 20px; font-weight: 600; letter-spacing: -0.02em; color: var(--text); }
-.stat-key { font-size: 11px; color: var(--sub); margin-top: 2px; }
+.stat { flex: 1; min-width: 130px; padding: 18px 18px 16px; border: 1px solid var(--border); border-radius: 7px; background: var(--surface); }
+.stat-val { font-size: 21px; font-weight: 600; letter-spacing: -0.02em; color: var(--text); }
+.stat-key { font-size: 11.5px; color: var(--sub); margin-top: 2px; }
 
 /* ─── HACKATHONS ─── */
 .hack-list { display: flex; flex-direction: column; }
-.hack-row {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 13px 0; border-bottom: 1px solid var(--border);
-}
+.hack-row { display: flex; align-items: center; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--border); }
 .hack-row:last-child { border-bottom: none; }
-.hack-name { font-size: 13px; font-weight: 500; color: var(--text); }
-.hack-org  { font-size: 11px; color: var(--sub); margin-top: 2px; }
-.hack-badge {
-  font-size: 10px; padding: 3px 9px;
-  border: 1px solid var(--border); border-radius: 20px; color: var(--sub);
-}
+.hack-name { font-size: 13.5px; font-weight: 500; color: var(--text); }
+.hack-org  { font-size: 12px; color: var(--sub); margin-top: 2px; }
+.hack-badge { font-size: 10.5px; padding: 3px 9px; border: 1px solid var(--border); border-radius: 20px; color: var(--sub); }
 
 /* ─── CERT ─── */
 .cert {
@@ -267,71 +239,58 @@ p.body strong { color: var(--text); font-weight: 500; }
   border-radius: 7px; background: var(--surface);
   margin-top: 36px; gap: 16px;
   text-decoration: none; color: inherit;
-  transition: border-color 0.15s;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
 }
-.cert:hover { border-color: var(--border2); }
-.cert-name { font-size: 13px; font-weight: 500; color: var(--text); }
-.cert-id   { font-size: 11px; color: var(--sub); margin-top: 3px; }
+.cert:hover { border-color: var(--border2); background: var(--clickable-glow); transform: translateY(-1px); }
+.cert-name { font-size: 13.5px; font-weight: 500; color: var(--text); }
+.cert-id   { font-size: 11.5px; color: var(--sub); margin-top: 3px; }
 .cert-chip {
-  font-size: 10px; font-weight: 500; letter-spacing: 0.06em;
+  font-size: 10.5px; font-weight: 500; letter-spacing: 0.06em;
   text-transform: uppercase; padding: 4px 9px;
   border: 1px solid var(--border); border-radius: 3px; color: var(--sub);
-  white-space: nowrap; flex-shrink: 0;
+  white-space: nowrap; flex-shrink: 0; transition: border-color 0.15s, color 0.15s;
 }
+.cert:hover .cert-chip { border-color: var(--border2); color: var(--text); }
 
 /* ─── PROJECTS ─── */
 .project-list { display: flex; flex-direction: column; gap: 2px; }
 .project-card {
-  border: 1px solid var(--border);
-  border-radius: 8px; overflow: hidden;
-  background: var(--surface);
-  transition: border-color 0.2s;
+  border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+  background: var(--surface); transition: border-color 0.2s, transform 0.25s cubic-bezier(.22,1,.36,1), box-shadow 0.25s;
 }
-.project-card:hover { border-color: var(--border2); }
+.project-card:hover { border-color: var(--border2); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
 
 .project-visual {
-  width: 100%; height: 160px;
-  position: relative; overflow: hidden;
-  background: var(--surface2);
-  border-bottom: 1px solid var(--border);
+  width: 100%; height: 164px; position: relative; overflow: hidden;
+  background: var(--surface2); border-bottom: 1px solid var(--border);
+  transition: height 0.25s cubic-bezier(.22,1,.36,1);
 }
-.project-visual canvas {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-}
+.project-card:hover .project-visual { height: 176px; }
+.project-visual canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 
 .project-body { padding: 22px 26px 24px; }
-.project-top {
-  display: flex; justify-content: space-between;
-  align-items: flex-start; margin-bottom: 8px;
-}
-.project-name { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; color: var(--text); }
-.project-year { font-size: 11px; color: var(--muted); padding-top: 2px; }
-.project-stack { font-size: 11px; color: var(--sub); margin-bottom: 12px; }
-.project-desc { font-size: 13px; color: var(--sub); line-height: 1.7; }
+.project-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+.project-name { font-size: 15.5px; font-weight: 600; letter-spacing: -0.01em; color: var(--text); }
+.project-year { font-size: 11.5px; color: var(--muted); padding-top: 2px; }
+.project-stack { font-size: 11.5px; color: var(--sub); margin-bottom: 12px; }
+.project-desc { font-size: 13.5px; color: var(--sub); line-height: 1.7; }
 .project-desc li { margin-left: 16px; margin-bottom: 2px; }
 .project-links { display: flex; gap: 10px; margin-top: 14px; }
 .project-link {
-  font-size: 11px; color: var(--sub);
-  text-decoration: none; padding: 4px 10px;
-  border: 1px solid var(--border); border-radius: 4px;
-  transition: color 0.15s, border-color 0.15s;
+  font-size: 11.5px; color: var(--sub); text-decoration: none;
+  padding: 4px 11px; border: 1px solid var(--border); border-radius: 4px;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
-.project-link:hover { color: var(--text); border-color: var(--border2); }
+.project-link:hover { color: var(--text); border-color: var(--border2); background: var(--clickable-glow); }
 
 /* ─── SKILLS ─── */
 .skill-section { margin-bottom: 28px; }
-.skill-section-title {
-  font-size: 10px; font-weight: 500;
-  letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--muted); margin-bottom: 10px;
-}
+.skill-section-title { font-size: 10.5px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
 .tags { display: flex; flex-wrap: wrap; gap: 6px; }
 .tag {
-  font-size: 12px; color: var(--sub);
-  background: var(--tag-bg);
-  border: 1px solid var(--border); border-radius: 4px;
-  padding: 4px 10px; transition: color 0.15s, border-color 0.15s;
+  font-size: 12.5px; color: var(--sub); background: var(--tag-bg);
+  border: 1px solid var(--border); border-radius: 4px; padding: 5px 11px;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
 .tag:hover { color: var(--text); border-color: var(--border2); }
 .tag.hi { color: var(--text); font-weight: 500; }
@@ -340,89 +299,138 @@ p.body strong { color: var(--text); font-weight: 500; }
 .contact-list { display: flex; flex-direction: column; }
 .contact-item {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 16px 0; border-bottom: 1px solid var(--border);
+  padding: 17px 0; border-bottom: 1px solid var(--border);
   text-decoration: none; color: inherit;
-  transition: opacity 0.15s;
+  transition: background 0.15s, padding-left 0.2s;
+  border-radius: 4px; margin: 0 -8px; padding-left: 8px; padding-right: 8px;
 }
 .contact-item:last-child { border-bottom: none; }
-.contact-item:hover { opacity: 0.65; }
+.contact-item:hover { background: var(--clickable-glow); padding-left: 14px; }
 .contact-left { display: flex; align-items: center; gap: 20px; }
-.contact-key { font-size: 11px; color: var(--muted); width: 52px; flex-shrink: 0; }
-.contact-val { font-size: 14px; font-weight: 500; color: var(--text); }
-.contact-arrow { font-size: 13px; color: var(--muted); }
+.contact-key { font-size: 11.5px; color: var(--muted); width: 56px; flex-shrink: 0; }
+.contact-val { font-size: 14.5px; font-weight: 500; color: var(--text); }
+.contact-arrow { font-size: 13px; color: var(--muted); transition: transform 0.15s; }
+.contact-item:hover .contact-arrow { transform: translate(2px, -2px); }
 
 /* ─── EDUCATION ─── */
 .edu { margin-top: 48px; }
-.edu-degree { font-size: 14px; font-weight: 600; color: var(--text); }
-.edu-school  { font-size: 13px; color: var(--sub); margin-top: 3px; }
-.edu-year    { font-size: 11px; color: var(--muted); margin-top: 5px; }
+.edu-degree { font-size: 14.5px; font-weight: 600; color: var(--text); }
+.edu-school  { font-size: 13.5px; color: var(--sub); margin-top: 3px; }
+.edu-year    { font-size: 11.5px; color: var(--muted); margin-top: 5px; }
 
-/* ─── RESUME PANEL ─── */
-#resume .resume-wrap {
-  max-width: 680px;
-  font-size: 13px; line-height: 1.7; color: var(--sub);
-}
-#resume .r-name { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: var(--text); margin-bottom: 3px; }
-#resume .r-contact { font-size: 11px; color: var(--sub); margin-bottom: 28px; }
+/* ─── RESUME ─── */
+#resume .resume-wrap { max-width: 680px; font-size: 13.5px; line-height: 1.7; color: var(--sub); }
+#resume .r-name { font-size: 23px; font-weight: 600; letter-spacing: -0.02em; color: var(--text); margin-bottom: 3px; }
+#resume .r-contact { font-size: 11.5px; color: var(--sub); margin-bottom: 28px; }
 #resume .r-section { margin-bottom: 24px; }
-#resume .r-section-title {
-  font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
-  text-transform: uppercase; color: var(--muted);
-  border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 12px;
-}
+#resume .r-section-title { font-size: 10.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 12px; }
 #resume .r-item { margin-bottom: 12px; }
-#resume .r-item-title { font-size: 13px; font-weight: 600; color: var(--text); }
-#resume .r-item-sub { font-size: 11px; color: var(--sub); margin-bottom: 4px; }
+#resume .r-item-title { font-size: 13.5px; font-weight: 600; color: var(--text); }
+#resume .r-item-sub { font-size: 11.5px; color: var(--sub); margin-bottom: 4px; }
 #resume .r-item ul { margin-left: 16px; }
-#resume .r-item li { margin-bottom: 2px; font-size: 12px; }
+#resume .r-item li { margin-bottom: 2px; font-size: 12.5px; }
 .print-btn {
   display: inline-flex; align-items: center; gap: 6px;
-  margin-bottom: 32px; padding: 8px 14px;
+  margin-bottom: 32px; padding: 9px 16px;
   border: 1px solid var(--border); border-radius: 5px;
   background: none; color: var(--sub);
-  font-family: inherit; font-size: 12px;
-  cursor: pointer; transition: all 0.15s;
+  font-family: inherit; font-size: 12.5px;
+  cursor: none; transition: all 0.15s;
 }
-.print-btn:hover { color: var(--text); border-color: var(--border2); }
+.print-btn:hover { color: var(--text); border-color: var(--border2); background: var(--clickable-glow); }
+
+/* ─── KEYBOARD NAV HINT ─── */
+.kbd-hint {
+  position: fixed; bottom: 20px; right: 20px;
+  font-size: 10.5px; color: var(--muted);
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 5px; padding: 6px 10px;
+  z-index: 8000; opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.kbd-hint.visible { opacity: 1; }
+.kbd-hint kbd {
+  font-family: monospace; font-size: 10px;
+  background: var(--tag-bg); border: 1px solid var(--border);
+  border-radius: 2px; padding: 1px 4px; margin: 0 2px;
+}
+
+/* ─── MOBILE BOTTOM NAV ─── */
+.mobile-nav {
+  display: none;
+  position: fixed; bottom: 0; left: 0; right: 0;
+  z-index: 20; background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+}
+.mobile-nav-inner { display: flex; justify-content: space-around; }
+.mobile-tab {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 6px 12px; border-radius: 8px;
+  background: none; border: none; cursor: none;
+  color: var(--sub); font-family: inherit; font-size: 10px;
+  transition: color 0.15s, background 0.15s; min-width: 56px;
+}
+.mobile-tab.active { color: var(--text); }
+.mobile-tab svg { width: 20px; height: 20px; }
+.mobile-tab-label { font-size: 9.5px; }
 
 /* ─── MOBILE ─── */
 @media (max-width: 820px) {
+  *, *::before, *::after { cursor: auto !important; }
+  #cursor-ring, #cursor-dot { display: none; }
   body { flex-direction: column; overflow: auto; }
   .sidebar {
-    width: 100%; height: auto; padding: 16px 18px;
+    width: 100%; height: auto; padding: 14px 18px;
     border-right: none; border-bottom: 1px solid var(--border);
-    flex-direction: column; gap: 12px;
+    flex-direction: column; gap: 10px;
   }
   .sidebar-name { margin-bottom: 0; }
-  .sidebar-role, .status { display: none; }
-  nav { flex-direction: row; gap: 2px; flex-wrap: wrap; }
-  .tab { padding: 7px 10px; font-size: 12px; }
-  .tab-dot { display: none; }
+  .sidebar-role, .status, .sidebar-links { display: none; }
+  nav { display: none; }
   .sidebar-bottom { margin-top: 0; flex-direction: row; align-items: center; gap: 8px; }
-  .sidebar-links { display: none; }
-  main { height: auto; overflow: visible; }
+  main { height: auto; overflow: visible; padding-bottom: 72px; }
   .panel { padding: 32px 18px 60px; max-width: 100%; }
   h1.title { font-size: 26px; }
   h2.title { font-size: 22px; }
   .stat-row { gap: 8px; }
   .project-visual { height: 130px; }
+  .project-card:hover .project-visual { height: 138px; }
+  .mobile-nav { display: block; }
+  .kbd-hint { display: none; }
 }
 
 /* ─── PRINT ─── */
 @media print {
   body { display: block; overflow: visible; background: white; color: black; }
-  .blob-wrap, .sidebar, #profile, #projects, #skills, #contact { display: none !important; }
+  .blob-wrap, .sidebar, #profile, #projects, #skills, #contact,
+  #cursor-ring, #cursor-dot, #scroll-progress, .mobile-nav, .kbd-hint { display: none !important; }
   #resume { display: block !important; max-width: 100%; padding: 0; }
   #resume .resume-wrap { color: #333; }
   #resume .r-name { color: black; }
   #resume .r-section-title { color: #555; }
   #resume .r-item-title { color: black; }
-  .print-btn { display: none; }
-  .eyebrow { display: none; }
+  .print-btn, .eyebrow { display: none; }
 }
   </style>
 </head>
 <body>
+
+<!-- Custom cursor elements -->
+<div id="cursor-ring" aria-hidden="true"></div>
+<div id="cursor-dot"  aria-hidden="true"></div>
+
+<!-- Skip to main content -->
+<a class="skip-link" href="#mainScroll">Skip to content</a>
+
+<!-- Scroll progress bar -->
+<div id="scroll-progress" aria-hidden="true"></div>
+
+<!-- Keyboard hint -->
+<div class="kbd-hint" id="kbdHint">
+  <kbd>1</kbd>–<kbd>5</kbd> navigate · <kbd>↑↓</kbd> scroll · <kbd>?</kbd> toggle keys
+</div>
 
 <div class="blob-wrap" aria-hidden="true">
   <div class="blob blob-1"></div>
@@ -431,25 +439,25 @@ p.body strong { color: var(--text); font-weight: 500; }
 </div>
 
 <!-- SIDEBAR -->
-<aside class="sidebar">
+<aside class="sidebar" role="navigation" aria-label="Site navigation">
   <div class="sidebar-name">Vishwesh Bhilare</div>
   <div class="sidebar-role">Computer Engineering · MMCOE</div>
   <div class="status"><span class="status-dot"></span>Open to opportunities</div>
 
-  <nav>
-    <button class="tab active" data-panel="profile"><span class="tab-dot"></span>Profile</button>
-    <button class="tab" data-panel="projects"><span class="tab-dot"></span>Projects</button>
-    <button class="tab" data-panel="skills"><span class="tab-dot"></span>Skills</button>
-    <button class="tab" data-panel="contact"><span class="tab-dot"></span>Contact</button>
-    <button class="tab" data-panel="resume"><span class="tab-dot"></span>Résumé</button>
+  <nav role="tablist" aria-label="Sections">
+    <button class="tab active" data-panel="profile"  role="tab" aria-selected="true"  aria-controls="profile"  tabindex="0"><span class="tab-dot"></span>Profile  <span class="tab-key">1</span></button>
+    <button class="tab"        data-panel="projects" role="tab" aria-selected="false" aria-controls="projects" tabindex="-1"><span class="tab-dot"></span>Projects <span class="tab-key">2</span></button>
+    <button class="tab"        data-panel="skills"   role="tab" aria-selected="false" aria-controls="skills"   tabindex="-1"><span class="tab-dot"></span>Skills   <span class="tab-key">3</span></button>
+    <button class="tab"        data-panel="contact"  role="tab" aria-selected="false" aria-controls="contact"  tabindex="-1"><span class="tab-dot"></span>Contact  <span class="tab-key">4</span></button>
+    <button class="tab"        data-panel="resume"   role="tab" aria-selected="false" aria-controls="resume"   tabindex="-1"><span class="tab-dot"></span>Résumé  <span class="tab-key">5</span></button>
   </nav>
 
   <div class="sidebar-bottom">
     <div class="sidebar-links">
-      <a class="sidebar-link" href="https://github.com/Vishwesh-Bhilare" target="_blank">GitHub ↗</a>
-      <a class="sidebar-link" href="https://www.linkedin.com/in/vishwesh-bhilare" target="_blank">LinkedIn ↗</a>
+      <a class="sidebar-link" href="https://github.com/Vishwesh-Bhilare"      target="_blank" rel="noopener">GitHub</a>
+      <a class="sidebar-link" href="https://www.linkedin.com/in/vishwesh-bhilare" target="_blank" rel="noopener">LinkedIn</a>
     </div>
-    <button class="toggle" id="themeToggle">
+    <button class="toggle" id="themeToggle" aria-label="Toggle colour theme">
       <span id="toggleIcon">☀</span>
       <span id="toggleLabel">Light</span>
     </button>
@@ -457,17 +465,17 @@ p.body strong { color: var(--text); font-weight: 500; }
 </aside>
 
 <!-- MAIN -->
-<main id="mainScroll">
+<main id="mainScroll" tabindex="-1" role="main">
 
   <!-- PROFILE -->
-  <div id="profile" class="panel active">
+  <div id="profile" class="panel active slide-in" role="tabpanel" aria-labelledby="tab-profile">
     <div class="eyebrow">Profile</div>
     <h1 class="title">Vishwesh Bhilare</h1>
     <p class="subtitle">Computer engineering undergrad at MMCOE, Pune. Building at the intersection of systems, software, and hardware — from embedded glove controllers to fully local AI pipelines.</p>
 
     <div class="stat-row">
       <div class="stat"><div class="stat-val">2028</div><div class="stat-key">Expected graduation</div></div>
-      <div class="stat"><div class="stat-val">4</div><div class="stat-key">Projects shipped</div></div>
+      <div class="stat"><div class="stat-val">5</div><div class="stat-key">Projects shipped</div></div>
       <div class="stat"><div class="stat-val">#2 ×3</div><div class="stat-key">Hackathon finishes</div></div>
       <div class="stat"><div class="stat-val">3</div><div class="stat-key">Languages spoken</div></div>
     </div>
@@ -479,21 +487,12 @@ p.body strong { color: var(--text); font-weight: 500; }
     <hr class="sep">
     <div class="label">Hackathons — 2026</div>
     <div class="hack-list">
-      <div class="hack-row">
-        <div><div class="hack-name">Xenia '26</div><div class="hack-org">PICT</div></div>
-        <div class="hack-badge">Runner-up</div>
-      </div>
-      <div class="hack-row">
-        <div><div class="hack-name">Avinya 2k26</div><div class="hack-org">IEEE MMCOE</div></div>
-        <div class="hack-badge">Runner-up</div>
-      </div>
-      <div class="hack-row">
-        <div><div class="hack-name">UI/UX Challenge</div><div class="hack-org">WebsiteVikreta</div></div>
-        <div class="hack-badge">Runner-up</div>
-      </div>
+      <div class="hack-row"><div><div class="hack-name">Xenia '26</div><div class="hack-org">PICT</div></div><div class="hack-badge">Runner-up</div></div>
+      <div class="hack-row"><div><div class="hack-name">Avinya 2k26</div><div class="hack-org">IEEE MMCOE</div></div><div class="hack-badge">Runner-up</div></div>
+      <div class="hack-row"><div><div class="hack-name">UI/UX Challenge</div><div class="hack-org">WebsiteVikreta</div></div><div class="hack-badge">Runner-up</div></div>
     </div>
 
-    <a class="cert" href="https://drive.google.com/file/d/1dE7-rnkvFcpmr5aGantJBd5N2eSzv80X/view?usp=sharing" target="_blank">
+    <a class="cert" href="https://drive.google.com/file/d/1dE7-rnkvFcpmr5aGantJBd5N2eSzv80X/view?usp=sharing" target="_blank" rel="noopener" aria-label="View Oracle OCI certification">
       <div>
         <div class="cert-name">Oracle Cloud Infrastructure 2025 Generative AI Professional</div>
         <div class="cert-id">ID: 323468573OCI25GAIOCP · Valid 2025–2027</div>
@@ -511,18 +510,16 @@ p.body strong { color: var(--text); font-weight: 500; }
   </div>
 
   <!-- PROJECTS -->
-  <div id="projects" class="panel">
+  <div id="projects" class="panel" role="tabpanel" aria-labelledby="tab-projects">
     <div class="eyebrow">Projects</div>
     <h2 class="title">Selected work</h2>
-    <p class="subtitle">Four projects built for real constraints — offline-first, no cloud dependency.</p>
+    <p class="subtitle">Five projects built for real constraints — offline-first, no cloud dependency.</p>
 
     <div class="project-list">
 
       <!-- SceneForge -->
-      <div class="project-card">
-        <div class="project-visual">
-          <canvas id="cv-sceneforge"></canvas>
-        </div>
+      <div class="project-card" tabindex="0" aria-label="SceneForge project">
+        <div class="project-visual"><canvas id="cv-sceneforge" aria-hidden="true"></canvas></div>
         <div class="project-body">
           <div class="project-top">
             <div class="project-name">SceneForge</div>
@@ -536,16 +533,14 @@ p.body strong { color: var(--text); font-weight: 500; }
             <li>~60% quality parity with high-end servers on average hardware, fully offline.</li>
           </ul>
           <div class="project-links">
-            <a class="project-link" href="https://github.com/Vishwesh-Bhilare/SceneForge" target="_blank">GitHub ↗</a>
+            <a class="project-link" href="https://github.com/Vishwesh-Bhilare/SceneForge" target="_blank" rel="noopener">GitHub ↗</a>
           </div>
         </div>
       </div>
 
       <!-- ReachlyEngine -->
-      <div class="project-card">
-        <div class="project-visual">
-          <canvas id="cv-reachly"></canvas>
-        </div>
+      <div class="project-card" tabindex="0" aria-label="ReachlyEngine project">
+        <div class="project-visual"><canvas id="cv-reachly" aria-hidden="true"></canvas></div>
         <div class="project-body">
           <div class="project-top">
             <div class="project-name">ReachlyEngine</div>
@@ -559,16 +554,32 @@ p.body strong { color: var(--text); font-weight: 500; }
             <li>Clean terminal UI built with Rich; extensible CLI workflow.</li>
           </ul>
           <div class="project-links">
-            <a class="project-link" href="https://github.com/Vishwesh-Bhilare/ReachlyEngine" target="_blank">GitHub ↗</a>
+            <a class="project-link" href="https://github.com/Vishwesh-Bhilare/ReachlyEngine" target="_blank" rel="noopener">GitHub ↗</a>
           </div>
         </div>
       </div>
 
-      <!-- XGestura -->
-      <div class="project-card">
-        <div class="project-visual">
-          <canvas id="cv-xgestura"></canvas>
+      <!-- Resilient Offline Mesh -->
+      <div class="project-card" tabindex="0" aria-label="Resilient Offline Mesh Communication Protocol project">
+        <div class="project-visual"><canvas id="cv-mesh" aria-hidden="true"></canvas></div>
+        <div class="project-body">
+          <div class="project-top">
+            <div class="project-name">Resilient Offline Mesh Communication Protocol</div>
+            <div class="project-year">2026</div>
+          </div>
+          <div class="project-stack">Embedded · BLE / LoRa · Mesh Networking · Protocol Design</div>
+          <ul class="project-desc">
+            <li>Each device gets a unique ID and continuously pings nearby nodes, maintaining a live presence map of the mesh.</li>
+            <li>Peer discovery propagates hop-by-hop — no central coordinator, no internet required.</li>
+            <li>When a gateway device with internet joins, all accumulated node IDs and presence data are published upstream.</li>
+            <li>Designed for resilience in disconnected environments: disaster zones, remote field ops, offline campuses.</li>
+          </ul>
         </div>
+      </div>
+
+      <!-- XGestura -->
+      <div class="project-card" tabindex="0" aria-label="XGestura project">
+        <div class="project-visual"><canvas id="cv-xgestura" aria-hidden="true"></canvas></div>
         <div class="project-body">
           <div class="project-top">
             <div class="project-name">XGestura</div>
@@ -581,16 +592,14 @@ p.body strong { color: var(--text); font-weight: 500; }
             <li>Firmware written in C++ for ESP32; receiver-side Python processes and injects HID events.</li>
           </ul>
           <div class="project-links">
-            <a class="project-link" href="https://github.com/Vishwesh-Bhilare/XGestura" target="_blank">GitHub ↗</a>
+            <a class="project-link" href="https://github.com/Vishwesh-Bhilare/XGestura" target="_blank" rel="noopener">GitHub ↗</a>
           </div>
         </div>
       </div>
 
       <!-- Exam Cell -->
-      <div class="project-card">
-        <div class="project-visual">
-          <canvas id="cv-examcell"></canvas>
-        </div>
+      <div class="project-card" tabindex="0" aria-label="Examination Cell Automation Tool project">
+        <div class="project-visual"><canvas id="cv-examcell" aria-hidden="true"></canvas></div>
         <div class="project-body">
           <div class="project-top">
             <div class="project-name">Examination Cell Automation Tool</div>
@@ -609,7 +618,7 @@ p.body strong { color: var(--text); font-weight: 500; }
   </div>
 
   <!-- SKILLS -->
-  <div id="skills" class="panel">
+  <div id="skills" class="panel" role="tabpanel" aria-labelledby="tab-skills">
     <div class="eyebrow">Skills</div>
     <h2 class="title">Toolkit</h2>
     <p class="subtitle">Languages, systems, and CS fundamentals I use regularly.</p>
@@ -617,47 +626,33 @@ p.body strong { color: var(--text); font-weight: 500; }
     <div class="skill-section">
       <div class="skill-section-title">Programming</div>
       <div class="tags">
-        <span class="tag hi">C++</span>
-        <span class="tag hi">C</span>
-        <span class="tag">Python</span>
+        <span class="tag hi">C++</span><span class="tag hi">C</span><span class="tag">Python</span>
       </div>
     </div>
     <div class="skill-section">
       <div class="skill-section-title">Systems & Embedded</div>
       <div class="tags">
-        <span class="tag hi">Linux — Arch</span>
-        <span class="tag">ESP32</span>
-        <span class="tag">Arduino</span>
-        <span class="tag">MPU6050 / IMU</span>
-        <span class="tag">HC-05 Bluetooth</span>
-        <span class="tag">Sensor Integration</span>
+        <span class="tag hi">Linux — Arch</span><span class="tag">ESP32</span><span class="tag">Arduino</span>
+        <span class="tag">MPU6050 / IMU</span><span class="tag">HC-05 Bluetooth</span><span class="tag">Sensor Integration</span>
       </div>
     </div>
     <div class="skill-section">
       <div class="skill-section-title">AI / ML</div>
       <div class="tags">
-        <span class="tag">YOLOv8</span>
-        <span class="tag">SAM</span>
-        <span class="tag">ControlNet</span>
-        <span class="tag">Stable Diffusion</span>
-        <span class="tag">Ollama</span>
-        <span class="tag">Local LLMs</span>
-        <span class="tag">OpenCV</span>
+        <span class="tag">YOLOv8</span><span class="tag">SAM</span><span class="tag">ControlNet</span>
+        <span class="tag">Stable Diffusion</span><span class="tag">Ollama</span><span class="tag">Local LLMs</span><span class="tag">OpenCV</span>
       </div>
     </div>
     <div class="skill-section">
       <div class="skill-section-title">CS Fundamentals</div>
       <div class="tags">
-        <span class="tag hi">Data Structures & Algorithms</span>
-        <span class="tag">OOP</span>
-        <span class="tag">Operating Systems</span>
-        <span class="tag">DBMS</span>
-        <span class="tag">Git</span>
+        <span class="tag hi">Data Structures & Algorithms</span><span class="tag">OOP</span>
+        <span class="tag">Operating Systems</span><span class="tag">DBMS</span><span class="tag">Git</span>
       </div>
     </div>
 
     <hr class="sep">
-    <a class="cert" href="https://drive.google.com/file/d/1dE7-rnkvFcpmr5aGantJBd5N2eSzv80X/view?usp=sharing" target="_blank">
+    <a class="cert" href="https://drive.google.com/file/d/1dE7-rnkvFcpmr5aGantJBd5N2eSzv80X/view?usp=sharing" target="_blank" rel="noopener" aria-label="View Oracle OCI certification">
       <div>
         <div class="cert-name">Oracle Cloud Infrastructure 2025 Generative AI Professional</div>
         <div class="cert-id">ID: 323468573OCI25GAIOCP · Valid 2025–2027</div>
@@ -667,38 +662,26 @@ p.body strong { color: var(--text); font-weight: 500; }
   </div>
 
   <!-- CONTACT -->
-  <div id="contact" class="panel">
+  <div id="contact" class="panel" role="tabpanel" aria-labelledby="tab-contact">
     <div class="eyebrow">Contact</div>
     <h2 class="title">Get in touch</h2>
     <p class="subtitle">Open to internships, collaborations, and interesting problems. Pune, India.</p>
 
     <div class="contact-list">
-      <a class="contact-item" href="mailto:bhilarevishwesh@gmail.com">
-        <div class="contact-left">
-          <span class="contact-key">Email</span>
-          <span class="contact-val">bhilarevishwesh@gmail.com</span>
-        </div>
+      <a class="contact-item" href="mailto:bhilarevishwesh@gmail.com" aria-label="Email Vishwesh">
+        <div class="contact-left"><span class="contact-key">Email</span><span class="contact-val">bhilarevishwesh@gmail.com</span></div>
         <span class="contact-arrow">↗</span>
       </a>
-      <a class="contact-item" href="https://github.com/Vishwesh-Bhilare" target="_blank">
-        <div class="contact-left">
-          <span class="contact-key">GitHub</span>
-          <span class="contact-val">Vishwesh-Bhilare</span>
-        </div>
+      <a class="contact-item" href="https://github.com/Vishwesh-Bhilare" target="_blank" rel="noopener" aria-label="GitHub profile">
+        <div class="contact-left"><span class="contact-key">GitHub</span><span class="contact-val">Vishwesh-Bhilare</span></div>
         <span class="contact-arrow">↗</span>
       </a>
-      <a class="contact-item" href="https://www.linkedin.com/in/vishwesh-bhilare" target="_blank">
-        <div class="contact-left">
-          <span class="contact-key">LinkedIn</span>
-          <span class="contact-val">Vishwesh Bhilare</span>
-        </div>
+      <a class="contact-item" href="https://www.linkedin.com/in/vishwesh-bhilare" target="_blank" rel="noopener" aria-label="LinkedIn profile">
+        <div class="contact-left"><span class="contact-key">LinkedIn</span><span class="contact-val">Vishwesh Bhilare</span></div>
         <span class="contact-arrow">↗</span>
       </a>
-      <a class="contact-item" href="tel:+918380020215">
-        <div class="contact-left">
-          <span class="contact-key">Phone</span>
-          <span class="contact-val">+91 83800 20215</span>
-        </div>
+      <a class="contact-item" href="tel:+918380020215" aria-label="Call Vishwesh">
+        <div class="contact-left"><span class="contact-key">Phone</span><span class="contact-val">+91 83800 20215</span></div>
         <span class="contact-arrow">↗</span>
       </a>
     </div>
@@ -712,9 +695,9 @@ p.body strong { color: var(--text); font-weight: 500; }
   </div>
 
   <!-- RESUME -->
-  <div id="resume" class="panel">
+  <div id="resume" class="panel" role="tabpanel" aria-labelledby="tab-resume">
     <div class="eyebrow">Résumé</div>
-    <button class="print-btn" onclick="window.print()">⎙ Print / Save as PDF</button>
+    <button class="print-btn" id="printBtn" onclick="printResume()">⎙ Download / Print PDF</button>
 
     <div class="resume-wrap">
       <div class="r-name">Vishwesh Bhilare</div>
@@ -737,6 +720,14 @@ p.body strong { color: var(--text); font-weight: 500; }
             <li>Football player removal pipeline using YOLOv8 segmentation and IoU-based tracking across frames.</li>
             <li>Motion-compensated homography background reconstruction; optional SD inpainting for high-quality fill.</li>
             <li>~60% quality parity with high-end servers on average hardware, runs fully offline.</li>
+          </ul>
+        </div>
+        <div class="r-item">
+          <div class="r-item-title">Resilient Offline Mesh Communication Protocol <span style="font-weight:400;color:var(--sub)">— Embedded · BLE / LoRa</span></div>
+          <div class="r-item-sub">2026</div>
+          <ul>
+            <li>Peer-to-peer mesh where each node broadcasts a unique ID; presence maps propagate hop-by-hop without internet.</li>
+            <li>Gateway device uploads accumulated node data when internet connectivity becomes available.</li>
           </ul>
         </div>
         <div class="r-item">
@@ -803,27 +794,163 @@ p.body strong { color: var(--text); font-weight: 500; }
 
 </main>
 
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-nav" aria-label="Mobile navigation">
+  <div class="mobile-nav-inner">
+    <button class="mobile-tab active" data-panel="profile">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="7" r="3"/><path d="M4 17c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+      <span class="mobile-tab-label">Profile</span>
+    </button>
+    <button class="mobile-tab" data-panel="projects">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="11" y="3" width="6" height="6" rx="1"/><rect x="3" y="11" width="6" height="6" rx="1"/><rect x="11" y="11" width="6" height="6" rx="1"/></svg>
+      <span class="mobile-tab-label">Projects</span>
+    </button>
+    <button class="mobile-tab" data-panel="skills">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2l2.4 4.9 5.4.8-3.9 3.8.9 5.4L10 14.4l-4.8 2.5.9-5.4L2.2 7.7l5.4-.8L10 2z"/></svg>
+      <span class="mobile-tab-label">Skills</span>
+    </button>
+    <button class="mobile-tab" data-panel="contact">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 5h14a1 1 0 011 1v9a1 1 0 01-1 1H3a1 1 0 01-1-1V6a1 1 0 011-1z"/><path d="M2 6l8 6 8-6"/></svg>
+      <span class="mobile-tab-label">Contact</span>
+    </button>
+    <button class="mobile-tab" data-panel="resume">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 2h10a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M7 7h6M7 10h6M7 13h4"/></svg>
+      <span class="mobile-tab-label">Résumé</span>
+    </button>
+  </div>
+</nav>
+
 <script>
+/* ── UTILS ── */
+const html     = document.documentElement;
+const mainEl   = document.getElementById('mainScroll');
+const progress = document.getElementById('scroll-progress');
+const kbdHint  = document.getElementById('kbdHint');
+
+/* ── CUSTOM CURSOR ── */
+const ring = document.getElementById('cursor-ring');
+const dot  = document.getElementById('cursor-dot');
+let mx = -100, my = -100, rx = -100, ry = -100;
+let cursorVisible = false;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  if (!cursorVisible) { ring.style.opacity = '1'; dot.style.opacity = '1'; cursorVisible = true; }
+  dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+});
+document.addEventListener('mouseleave', () => { ring.style.opacity = '0'; dot.style.opacity = '0'; cursorVisible = false; });
+
+// Smooth ring follow with lag
+function animateCursor() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  requestAnimationFrame(animateCursor);
+}
+animateCursor();
+
+// Hover effect on interactive elements
+const interactiveSelectors = 'a, button, .project-card, .cert, .tag, .contact-item, .tab, .toggle, .print-btn';
+document.addEventListener('mouseover', e => {
+  if (e.target.closest(interactiveSelectors)) document.body.classList.add('cursor-hover');
+});
+document.addEventListener('mouseout', e => {
+  if (e.target.closest(interactiveSelectors)) document.body.classList.remove('cursor-hover');
+});
+document.addEventListener('mousedown', () => document.body.classList.add('cursor-click'));
+document.addEventListener('mouseup',   () => document.body.classList.remove('cursor-click'));
+
+/* ── SCROLL PROGRESS ── */
+mainEl.addEventListener('scroll', () => {
+  const el   = mainEl;
+  const pct  = el.scrollTop / (el.scrollHeight - el.clientHeight) * 100;
+  const panel = document.querySelector('.panel.active');
+  const isProjects = panel && panel.id === 'projects';
+  progress.style.width = pct + '%';
+  progress.classList.toggle('active', isProjects && el.scrollTop > 20);
+});
+
 /* ── TAB SWITCHING ── */
-const tabs   = document.querySelectorAll('.tab');
-const panels = document.querySelectorAll('.panel');
-tabs.forEach(tab => {
-  tab.addEventListener('click', () => {
-    tabs.forEach(t => t.classList.remove('active'));
-    panels.forEach(p => p.classList.remove('active'));
-    tab.classList.add('active');
-    const target = document.getElementById(tab.dataset.panel);
-    target.classList.add('active');
-    document.getElementById('mainScroll').scrollTo({ top: 0, behavior: 'instant' });
-    // lazy-init canvases when projects tab opens
-    if (tab.dataset.panel === 'projects') {
-      requestAnimationFrame(initCanvases);
+const tabs       = [...document.querySelectorAll('.tab')];
+const mobileTabs = [...document.querySelectorAll('.mobile-tab')];
+const panels     = [...document.querySelectorAll('.panel')];
+const PANELS     = ['profile','projects','skills','contact','resume'];
+
+function switchPanel(name) {
+  const currentPanel = document.querySelector('.panel.active');
+  if (currentPanel && currentPanel.id === name) return;
+
+  tabs.forEach(t => { t.classList.toggle('active', t.dataset.panel === name); t.setAttribute('aria-selected', t.dataset.panel === name); t.tabIndex = t.dataset.panel === name ? 0 : -1; });
+  mobileTabs.forEach(t => t.classList.toggle('active', t.dataset.panel === name));
+
+  panels.forEach(p => {
+    if (p.id === name) {
+      p.classList.add('active', 'slide-in');
+      p.removeAttribute('hidden');
+      setTimeout(() => p.classList.remove('slide-in'), 300);
+    } else {
+      p.classList.remove('active', 'slide-in');
     }
   });
+
+  mainEl.scrollTo({ top: 0, behavior: 'instant' });
+
+  if (name === 'projects') requestAnimationFrame(initCanvases);
+
+  // Update progress visibility
+  progress.classList.remove('active');
+}
+
+tabs.forEach(t => t.addEventListener('click', () => switchPanel(t.dataset.panel)));
+mobileTabs.forEach(t => t.addEventListener('click', () => switchPanel(t.dataset.panel)));
+
+/* ── KEYBOARD NAVIGATION ── */
+let kbdHintTimeout;
+document.addEventListener('keydown', e => {
+  const key = e.key;
+
+  // Number keys 1-5 for panels
+  if (['1','2','3','4','5'].includes(key) && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    const target = document.activeElement;
+    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
+    switchPanel(PANELS[+key - 1]);
+    tabs[+key - 1].focus();
+    return;
+  }
+
+  // Arrow keys for tab navigation within sidebar
+  if (e.target.closest('nav')) {
+    const activeTab = document.querySelector('.tab.active');
+    const idx = tabs.indexOf(activeTab);
+    if (key === 'ArrowDown' && idx < tabs.length - 1) { e.preventDefault(); tabs[idx+1].focus(); switchPanel(tabs[idx+1].dataset.panel); }
+    if (key === 'ArrowUp'   && idx > 0)                { e.preventDefault(); tabs[idx-1].focus(); switchPanel(tabs[idx-1].dataset.panel); }
+    if (key === 'Home') { e.preventDefault(); tabs[0].focus(); switchPanel(tabs[0].dataset.panel); }
+    if (key === 'End')  { e.preventDefault(); tabs[tabs.length-1].focus(); switchPanel(tabs[tabs.length-1].dataset.panel); }
+  }
+
+  // Scroll in main
+  if (key === 'ArrowDown' && !e.target.closest('nav')) mainEl.scrollBy({ top: 80, behavior: 'smooth' });
+  if (key === 'ArrowUp'   && !e.target.closest('nav')) mainEl.scrollBy({ top: -80, behavior: 'smooth' });
+  if (key === 'PageDown') mainEl.scrollBy({ top: 400, behavior: 'smooth' });
+  if (key === 'PageUp')   mainEl.scrollBy({ top: -400, behavior: 'smooth' });
+
+  // ? toggle keyboard hints
+  if (key === '?') {
+    document.body.classList.toggle('show-keys');
+    kbdHint.classList.add('visible');
+    clearTimeout(kbdHintTimeout);
+    kbdHintTimeout = setTimeout(() => kbdHint.classList.remove('visible'), 3000);
+  }
+
+  // Show hint on Tab key
+  if (key === 'Tab') {
+    kbdHint.classList.add('visible');
+    clearTimeout(kbdHintTimeout);
+    kbdHintTimeout = setTimeout(() => kbdHint.classList.remove('visible'), 2500);
+  }
 });
 
 /* ── THEME TOGGLE ── */
-const html   = document.documentElement;
 const togBtn = document.getElementById('themeToggle');
 const togIco = document.getElementById('toggleIcon');
 const togLbl = document.getElementById('toggleLabel');
@@ -832,12 +959,17 @@ togBtn.addEventListener('click', () => {
   html.dataset.theme = dark ? 'light' : 'dark';
   togIco.textContent = dark ? '☾' : '☀';
   togLbl.textContent = dark ? 'Dark' : 'Light';
-  // re-draw canvases with new colours
-  Object.values(canvasAnimations).forEach(a => a && a.recolor && a.recolor());
 });
 
+/* ── PRINT / PDF ── */
+function printResume() {
+  const prev = document.title;
+  document.title = 'Vishwesh_Bhilare_Resume';
+  window.print();
+  document.title = prev;
+}
+
 /* ── CANVAS ANIMATIONS ── */
-const canvasAnimations = {};
 let canvasesInited = false;
 
 function getCSSVar(name) {
@@ -849,6 +981,7 @@ function initCanvases() {
   canvasesInited = true;
   initSceneForge();
   initReachly();
+  initMesh();
   initXGestura();
   initExamCell();
 }
@@ -858,264 +991,333 @@ function initSceneForge() {
   const canvas = document.getElementById('cv-sceneforge');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-
-  function resize() {
-    canvas.width  = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
-  }
-  resize();
-  window.addEventListener('resize', resize);
-
+  function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
+  resize(); window.addEventListener('resize', resize);
   const COLS = 12, ROWS = 4;
   let t = 0;
-
-  // A few "mask" cells that pulse
-  const masks = [
-    {c:2,r:1},{c:3,r:1},{c:3,r:2},{c:4,r:2},{c:7,r:1},{c:8,r:1},{c:8,r:2}
-  ];
-
+  const masks = [{c:2,r:1},{c:3,r:1},{c:3,r:2},{c:4,r:2},{c:7,r:1},{c:8,r:1},{c:8,r:2}];
   function draw() {
     const W = canvas.width, H = canvas.height;
     ctx.clearRect(0, 0, W, H);
-
     const cw = W / COLS, ch = H / ROWS;
-    const lineCol  = getCSSVar('--canvas-line');
-    const dotCol   = getCSSVar('--canvas-dot');
-    const glowCol  = getCSSVar('--canvas-glow');
-
-    // Draw grid
-    ctx.strokeStyle = lineCol;
-    ctx.lineWidth = 0.5;
-    for (let c = 0; c <= COLS; c++) {
-      ctx.beginPath();
-      ctx.moveTo(c * cw, 0);
-      ctx.lineTo(c * cw, H);
-      ctx.stroke();
-    }
-    for (let r = 0; r <= ROWS; r++) {
-      ctx.beginPath();
-      ctx.moveTo(0, r * ch);
-      ctx.lineTo(W, r * ch);
-      ctx.stroke();
-    }
-
-    // Mask cells
+    const lineCol = getCSSVar('--canvas-line');
+    const dotCol  = getCSSVar('--canvas-dot');
+    ctx.strokeStyle = lineCol; ctx.lineWidth = 0.5;
+    for (let c = 0; c <= COLS; c++) { ctx.beginPath(); ctx.moveTo(c*cw,0); ctx.lineTo(c*cw,H); ctx.stroke(); }
+    for (let r = 0; r <= ROWS; r++) { ctx.beginPath(); ctx.moveTo(0,r*ch); ctx.lineTo(W,r*ch); ctx.stroke(); }
     masks.forEach((m, i) => {
-      const alpha = 0.3 + 0.25 * Math.sin(t * 0.04 + i * 1.1);
-      ctx.fillStyle = `rgba(255,255,255,${alpha * (html.dataset.theme==='dark' ? 0.07 : 0.04)})`;
-      ctx.fillRect(m.c * cw + 1, m.r * ch + 1, cw - 2, ch - 2);
+      const alpha = 0.3 + 0.25*Math.sin(t*0.04 + i*1.1);
+      ctx.globalAlpha = alpha * (html.dataset.theme==='dark' ? 0.5 : 0.25);
+      ctx.fillStyle = dotCol; ctx.fillRect(m.c*cw+1, m.r*ch+1, cw-2, ch-2);
+      ctx.globalAlpha = 1;
     });
-
-    // Scanning line
-    const scanX = (((t * 0.8) % (W + 60)) - 30);
-    const grad = ctx.createLinearGradient(scanX - 30, 0, scanX + 30, 0);
-    grad.addColorStop(0, 'transparent');
-    grad.addColorStop(0.5, dotCol);
-    grad.addColorStop(1, 'transparent');
-    ctx.strokeStyle = grad;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(scanX, 0);
-    ctx.lineTo(scanX, H);
-    ctx.stroke();
-
-    // Corner dots
+    const scanX = ((t*0.8) % (W+60)) - 30;
+    const grad = ctx.createLinearGradient(scanX-30,0,scanX+30,0);
+    grad.addColorStop(0,'transparent'); grad.addColorStop(0.5,dotCol); grad.addColorStop(1,'transparent');
+    ctx.strokeStyle = grad; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(scanX,0); ctx.lineTo(scanX,H); ctx.stroke();
     for (let c = 0; c <= COLS; c++) {
       for (let r = 0; r <= ROWS; r++) {
-        const pulse = 0.4 + 0.3 * Math.sin(t * 0.03 + c * 0.5 + r * 0.8);
-        ctx.fillStyle = dotCol.replace(')', `, ${pulse})`).replace('rgba', 'rgba').replace('rgb(', 'rgba(').replace(')', `, ${pulse})`);
-        // simpler:
-        ctx.globalAlpha = pulse;
-        ctx.fillStyle = dotCol;
-        ctx.fillRect(c * cw - 1, r * ch - 1, 2, 2);
+        const pulse = 0.4+0.3*Math.sin(t*0.03+c*0.5+r*0.8);
+        ctx.globalAlpha = pulse; ctx.fillStyle = dotCol;
+        ctx.fillRect(c*cw-1, r*ch-1, 2, 2);
       }
     }
     ctx.globalAlpha = 1;
-
-    t++;
-    canvasAnimations['sceneforge'] = { raf: requestAnimationFrame(draw) };
+    t++; requestAnimationFrame(draw);
   }
   draw();
 }
 
-/* ── ReachlyEngine: particle mesh — profile node → persona → channels ── */
+/* ── ReachlyEngine: particle mesh ── */
 function initReachly() {
   const canvas = document.getElementById('cv-reachly');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-
   function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
-  resize();
-  window.addEventListener('resize', resize);
-
-  // Fixed node layout: source, persona center, 4 channel outputs
+  resize(); window.addEventListener('resize', resize);
   function getNodes() {
     const W = canvas.width, H = canvas.height;
     return {
-      src:      { x: W * 0.12, y: H * 0.5,  label: 'Profile' },
-      persona:  { x: W * 0.45, y: H * 0.5,  label: 'Persona' },
-      email:    { x: W * 0.78, y: H * 0.18, label: 'Email' },
-      whatsapp: { x: W * 0.78, y: H * 0.39, label: 'WhatsApp' },
-      linkedin: { x: W * 0.78, y: H * 0.61, label: 'LinkedIn' },
-      insta:    { x: W * 0.78, y: H * 0.82, label: 'Instagram' },
+      src:      {x:W*0.12,y:H*0.5},
+      persona:  {x:W*0.45,y:H*0.5},
+      email:    {x:W*0.78,y:H*0.18},
+      whatsapp: {x:W*0.78,y:H*0.39},
+      linkedin: {x:W*0.78,y:H*0.61},
+      insta:    {x:W*0.78,y:H*0.82},
     };
   }
-
-  // Particles flowing along each edge
   class Particle {
-    constructor(from, to, speed) {
-      this.from = from; this.to = to;
-      this.t = Math.random();
-      this.speed = speed || 0.004 + Math.random() * 0.003;
-    }
-    update() { this.t += this.speed; if (this.t > 1) this.t = 0; }
-    pos(nodes) {
-      const a = nodes[this.from], b = nodes[this.to];
-      return { x: a.x + (b.x - a.x) * this.t, y: a.y + (b.y - a.y) * this.t };
-    }
+    constructor(from, to) { this.from=from; this.to=to; this.t=Math.random(); this.speed=0.004+Math.random()*0.003; }
+    update() { this.t+=this.speed; if(this.t>1) this.t=0; }
+    pos(n) { const a=n[this.from],b=n[this.to]; return {x:a.x+(b.x-a.x)*this.t, y:a.y+(b.y-a.y)*this.t}; }
   }
-
-  const edges = [
-    ['src','persona'],
-    ['persona','email'], ['persona','whatsapp'],
-    ['persona','linkedin'], ['persona','insta']
-  ];
-
+  const edges = [['src','persona'],['persona','email'],['persona','whatsapp'],['persona','linkedin'],['persona','insta']];
   const particles = [];
-  edges.forEach(([a,b]) => {
-    for (let i = 0; i < 3; i++) particles.push(new Particle(a, b));
-  });
-
+  edges.forEach(([a,b]) => { for(let i=0;i<3;i++) particles.push(new Particle(a,b)); });
   let t = 0;
   function draw() {
     const W = canvas.width, H = canvas.height;
-    ctx.clearRect(0, 0, W, H);
+    ctx.clearRect(0,0,W,H);
     const nodes = getNodes();
-    const lineCol = getCSSVar('--canvas-line');
-    const dotCol  = getCSSVar('--canvas-dot');
-
-    // Edges
-    edges.forEach(([a, b]) => {
-      ctx.strokeStyle = lineCol;
-      ctx.lineWidth = 0.75;
-      ctx.beginPath();
-      ctx.moveTo(nodes[a].x, nodes[a].y);
-      ctx.lineTo(nodes[b].x, nodes[b].y);
-      ctx.stroke();
+    const lineCol = getCSSVar('--canvas-line'), dotCol = getCSSVar('--canvas-dot');
+    edges.forEach(([a,b]) => { ctx.strokeStyle=lineCol; ctx.lineWidth=0.75; ctx.beginPath(); ctx.moveTo(nodes[a].x,nodes[a].y); ctx.lineTo(nodes[b].x,nodes[b].y); ctx.stroke(); });
+    particles.forEach(p => { p.update(); const pos=p.pos(nodes); ctx.globalAlpha=0.7; ctx.fillStyle=dotCol; ctx.beginPath(); ctx.arc(pos.x,pos.y,1.8,0,Math.PI*2); ctx.fill(); });
+    ctx.globalAlpha=1;
+    Object.entries(nodes).forEach(([key,n]) => {
+      const pulse=1+0.15*Math.sin(t*0.04+n.x*0.01);
+      const r=(key==='persona'?6:4)*pulse;
+      ctx.fillStyle=getCSSVar('--surface2'); ctx.strokeStyle=lineCol; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.arc(n.x,n.y,r,0,Math.PI*2); ctx.fill(); ctx.stroke();
+      ctx.fillStyle=dotCol; ctx.globalAlpha=0.6; ctx.beginPath(); ctx.arc(n.x,n.y,1.5,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1;
     });
-
-    // Particles
-    particles.forEach(p => {
-      p.update();
-      const pos = p.pos(nodes);
-      ctx.globalAlpha = 0.7;
-      ctx.fillStyle = dotCol;
-      ctx.beginPath();
-      ctx.arc(pos.x, pos.y, 1.8, 0, Math.PI * 2);
-      ctx.fill();
-    });
-    ctx.globalAlpha = 1;
-
-    // Nodes
-    Object.entries(nodes).forEach(([key, n]) => {
-      const pulse = 1 + 0.15 * Math.sin(t * 0.04 + n.x * 0.01);
-      const r = (key === 'persona' ? 6 : 4) * pulse;
-      ctx.fillStyle = getCSSVar('--surface2');
-      ctx.strokeStyle = lineCol;
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
-      // center dot
-      ctx.fillStyle = dotCol;
-      ctx.globalAlpha = 0.6;
-      ctx.beginPath();
-      ctx.arc(n.x, n.y, 1.5, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.globalAlpha = 1;
-    });
-
-    t++;
-    requestAnimationFrame(draw);
+    t++; requestAnimationFrame(draw);
   }
   draw();
 }
 
-/* ── XGestura: oscilloscope signal waves (accel X,Y,Z + BT signal) ── */
+/* ── Mesh: resilient offline mesh network visualization ── */
+function initMesh() {
+  const canvas = document.getElementById('cv-mesh');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
+  resize(); window.addEventListener('resize', resize);
+
+  // Nodes: offline peer nodes + 1 gateway that joins later
+  const NODE_COUNT = 7;
+  let t = 0;
+  const GATEWAY_JOIN = 180; // frames until gateway appears
+
+  function makeNodes(W, H) {
+    // Fixed positions in a scattered cluster
+    const positions = [
+      {x:0.18,y:0.28},{x:0.38,y:0.18},{x:0.55,y:0.35},{x:0.72,y:0.22},
+      {x:0.28,y:0.65},{x:0.50,y:0.72},{x:0.68,y:0.60}
+    ];
+    return positions.map((p,i) => ({
+      x: W*p.x, y: H*p.y,
+      id: `N${String(i+1).padStart(2,'0')}`,
+      phase: i*0.7,
+      known: new Set([i]) // which node IDs this node knows about
+    }));
+  }
+
+  // Gateway node (internet-connected, joins later)
+  function getGateway(W, H) {
+    return { x: W*0.90, y: H*0.48, id: 'GW', isGateway: true };
+  }
+
+  // Mesh edges (which nodes are adjacent)
+  const edgePairs = [[0,1],[1,2],[2,3],[0,4],[4,5],[5,6],[2,5],[1,4],[3,6]];
+
+  // Ping particles (peer → peer)
+  class PingParticle {
+    constructor(fromIdx, toIdx) {
+      this.from = fromIdx; this.to = toIdx;
+      this.t = Math.random(); this.speed = 0.006 + Math.random()*0.004;
+      this.alive = true;
+    }
+    update() { this.t += this.speed; if (this.t > 1) this.alive = false; }
+  }
+  // Gateway upload particles
+  class UploadParticle {
+    constructor(fromIdx, nodes, gw) {
+      this.fromIdx = fromIdx; this.nodes = nodes; this.gw = gw;
+      this.t = 0; this.speed = 0.007 + Math.random()*0.004;
+    }
+    update() { this.t += this.speed; return this.t <= 1; }
+    pos() {
+      const from = this.nodes[this.fromIdx];
+      return { x: from.x + (this.gw.x-from.x)*this.t, y: from.y + (this.gw.y-from.y)*this.t };
+    }
+  }
+
+  let pingParticles = [];
+  let uploadParticles = [];
+  let gatewayVisible = false;
+  let gatewayPulse = 0;
+  let publishDone = false;
+
+  // Spawn pings periodically
+  let pingTimer = 0;
+
+  function draw() {
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0,0,W,H);
+    const nodes = makeNodes(W,H);
+    const gw = getGateway(W,H);
+    const lineCol = getCSSVar('--canvas-line');
+    const dotCol  = getCSSVar('--canvas-dot');
+    const surf2   = getCSSVar('--surface2');
+    const isDark  = html.dataset.theme === 'dark';
+
+    // Gateway joins after GATEWAY_JOIN frames
+    if (t > GATEWAY_JOIN) gatewayVisible = true;
+
+    // Spawn ping particles between mesh nodes
+    pingTimer++;
+    if (pingTimer % 18 === 0) {
+      const e = edgePairs[Math.floor(Math.random()*edgePairs.length)];
+      pingParticles.push(new PingParticle(e[0],e[1]));
+      if (Math.random()>0.5) pingParticles.push(new PingParticle(e[1],e[0]));
+    }
+
+    // Once gateway visible, spawn upload particles from each node to GW
+    if (gatewayVisible && !publishDone) {
+      if (t % 22 === 0) {
+        const idx = Math.floor(Math.random()*NODE_COUNT);
+        uploadParticles.push(new UploadParticle(idx, nodes, gw));
+      }
+      if (t > GATEWAY_JOIN + 120) publishDone = true;
+    }
+
+    // ── Draw mesh edges ──
+    edgePairs.forEach(([a,b]) => {
+      ctx.strokeStyle = lineCol; ctx.lineWidth = 0.75;
+      ctx.beginPath(); ctx.moveTo(nodes[a].x,nodes[a].y); ctx.lineTo(nodes[b].x,nodes[b].y); ctx.stroke();
+    });
+
+    // ── Draw gateway connection edges (when visible) ──
+    if (gatewayVisible) {
+      nodes.forEach((n,i) => {
+        // Connect gateway to nearest nodes
+        if ([2,5,6].includes(i)) {
+          ctx.strokeStyle = isDark ? 'rgba(74,222,128,0.18)' : 'rgba(22,163,74,0.18)';
+          ctx.lineWidth = 0.75; ctx.setLineDash([3,4]);
+          ctx.beginPath(); ctx.moveTo(n.x,n.y); ctx.lineTo(gw.x,gw.y); ctx.stroke();
+          ctx.setLineDash([]);
+        }
+      });
+    }
+
+    // ── Update & draw ping particles ──
+    pingParticles = pingParticles.filter(p => p.alive);
+    pingParticles.forEach(p => {
+      p.update();
+      const from = nodes[p.from], to = nodes[p.to];
+      const px = from.x + (to.x-from.x)*p.t;
+      const py = from.y + (to.y-from.y)*p.t;
+      ctx.globalAlpha = (1-p.t)*0.8;
+      ctx.fillStyle = dotCol;
+      ctx.beginPath(); ctx.arc(px,py,2,0,Math.PI*2); ctx.fill();
+      ctx.globalAlpha = 1;
+    });
+
+    // ── Update & draw upload particles ──
+    if (gatewayVisible) {
+      uploadParticles = uploadParticles.filter(p => p.update());
+      uploadParticles.forEach(p => {
+        const pos = p.pos();
+        ctx.globalAlpha = (1-p.t)*0.9;
+        ctx.fillStyle = isDark ? '#4ade80' : '#16a34a';
+        ctx.beginPath(); ctx.arc(pos.x,pos.y,2.2,0,Math.PI*2); ctx.fill();
+        ctx.globalAlpha = 1;
+      });
+    }
+
+    // ── Draw mesh nodes ──
+    nodes.forEach((n,i) => {
+      const pulse = 1 + 0.12*Math.sin(t*0.035+n.phase);
+      const r = 4.5 * pulse;
+      ctx.fillStyle = surf2; ctx.strokeStyle = lineCol; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(n.x,n.y,r,0,Math.PI*2); ctx.fill(); ctx.stroke();
+      // node dot
+      ctx.fillStyle = dotCol; ctx.globalAlpha = 0.65;
+      ctx.beginPath(); ctx.arc(n.x,n.y,1.5,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1;
+      // node ID label (tiny)
+      ctx.fillStyle = dotCol; ctx.globalAlpha = 0.4;
+      ctx.font = '7px monospace'; ctx.textAlign='center';
+      ctx.fillText(n.id, n.x, n.y-8); ctx.globalAlpha=1;
+    });
+
+    // ── Draw gateway node ──
+    if (gatewayVisible) {
+      gatewayPulse = Math.min(gatewayPulse+0.04, 1);
+      const gpulse = 1 + 0.18*Math.sin(t*0.05);
+      const gr = 7 * gpulse * gatewayPulse;
+
+      // Glow ring
+      const glowGrad = ctx.createRadialGradient(gw.x,gw.y,0,gw.x,gw.y,gr*3);
+      glowGrad.addColorStop(0, isDark ? 'rgba(74,222,128,0.12)' : 'rgba(22,163,74,0.10)');
+      glowGrad.addColorStop(1, 'transparent');
+      ctx.fillStyle = glowGrad; ctx.globalAlpha = gatewayPulse;
+      ctx.beginPath(); ctx.arc(gw.x,gw.y,gr*3,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1;
+
+      // Node body
+      ctx.fillStyle = surf2;
+      ctx.strokeStyle = isDark ? 'rgba(74,222,128,0.6)' : 'rgba(22,163,74,0.6)';
+      ctx.lineWidth = 1.5; ctx.globalAlpha = gatewayPulse;
+      ctx.beginPath(); ctx.arc(gw.x,gw.y,gr,0,Math.PI*2); ctx.fill(); ctx.stroke();
+      // Center dot
+      ctx.fillStyle = isDark ? '#4ade80' : '#16a34a';
+      ctx.globalAlpha = 0.85 * gatewayPulse;
+      ctx.beginPath(); ctx.arc(gw.x,gw.y,2.5,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1;
+      // Label
+      ctx.fillStyle = isDark ? '#4ade80' : '#16a34a';
+      ctx.globalAlpha = 0.7 * gatewayPulse;
+      ctx.font = '7px monospace'; ctx.textAlign='center';
+      ctx.fillText('GW', gw.x, gw.y-10);
+      ctx.font = '6px monospace'; ctx.fillText('ONLINE', gw.x, gw.y+14);
+      ctx.globalAlpha=1;
+    }
+
+    // ── Internet signal lines from gateway (after publish) ──
+    if (publishDone) {
+      const alpha = 0.12 + 0.05*Math.sin(t*0.06);
+      for (let i=1;i<=3;i++) {
+        const rad = i*22 + 4*Math.sin(t*0.03+i);
+        ctx.strokeStyle = isDark ? `rgba(74,222,128,${alpha})` : `rgba(22,163,74,${alpha*0.8})`;
+        ctx.lineWidth = 0.8;
+        ctx.beginPath(); ctx.arc(gw.x,gw.y,rad,0,Math.PI*2); ctx.stroke();
+      }
+    }
+
+    t++; requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+/* ── XGestura: oscilloscope signal waves ── */
 function initXGestura() {
   const canvas = document.getElementById('cv-xgestura');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-
   function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
-  resize();
-  window.addEventListener('resize', resize);
-
-  // 3 channels: accel X, Y, Z
+  resize(); window.addEventListener('resize', resize);
   const channels = [
-    { freq: 0.018, amp: 0.28, phase: 0,      label: 'accel_x' },
-    { freq: 0.024, amp: 0.20, phase: 2.1,    label: 'accel_y' },
-    { freq: 0.013, amp: 0.16, phase: 4.3,    label: 'accel_z' },
+    {freq:0.018,amp:0.28,phase:0},
+    {freq:0.024,amp:0.20,phase:2.1},
+    {freq:0.013,amp:0.16,phase:4.3},
   ];
-
   let t = 0;
   function draw() {
     const W = canvas.width, H = canvas.height;
-    ctx.clearRect(0, 0, W, H);
-    const lineCol = getCSSVar('--canvas-line');
-    const dotCol  = getCSSVar('--canvas-dot');
-
-    // Grid lines
-    ctx.strokeStyle = lineCol;
-    ctx.lineWidth = 0.5;
-    for (let i = 1; i < 4; i++) {
-      ctx.beginPath(); ctx.moveTo(0, H * i / 4); ctx.lineTo(W, H * i / 4); ctx.stroke();
-    }
-    for (let i = 1; i < 6; i++) {
-      ctx.beginPath(); ctx.moveTo(W * i / 6, 0); ctx.lineTo(W * i / 6, H); ctx.stroke();
-    }
-
-    // Waves
-    channels.forEach((ch, ci) => {
-      const baseY = H * (0.25 + ci * 0.25);
-      ctx.strokeStyle = dotCol;
-      ctx.lineWidth = 1.2;
-      ctx.globalAlpha = 0.55 + ci * 0.1;
+    ctx.clearRect(0,0,W,H);
+    const lineCol = getCSSVar('--canvas-line'), dotCol = getCSSVar('--canvas-dot');
+    ctx.strokeStyle=lineCol; ctx.lineWidth=0.5;
+    for(let i=1;i<4;i++){ctx.beginPath();ctx.moveTo(0,H*i/4);ctx.lineTo(W,H*i/4);ctx.stroke();}
+    for(let i=1;i<6;i++){ctx.beginPath();ctx.moveTo(W*i/6,0);ctx.lineTo(W*i/6,H);ctx.stroke();}
+    channels.forEach((ch,ci) => {
+      const baseY = H*(0.25+ci*0.25);
+      ctx.strokeStyle=dotCol; ctx.lineWidth=1.2; ctx.globalAlpha=0.55+ci*0.1;
       ctx.beginPath();
-      for (let x = 0; x < W; x++) {
-        const phase = t * ch.freq + ch.phase;
-        // compound wave: fundamental + harmonic for realism
-        const y = baseY
-          - H * ch.amp * Math.sin(x * 0.04 + phase)
-          - H * ch.amp * 0.3 * Math.sin(x * 0.09 + phase * 1.3);
-        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      for(let x=0;x<W;x++){
+        const phase=t*ch.freq+ch.phase;
+        const y=baseY-H*ch.amp*Math.sin(x*0.04+phase)-H*ch.amp*0.3*Math.sin(x*0.09+phase*1.3);
+        x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
       }
-      ctx.stroke();
-      ctx.globalAlpha = 1;
+      ctx.stroke(); ctx.globalAlpha=1;
     });
-
-    // Moving cursor line
-    const curX = (t * 1.5) % W;
-    const grad = ctx.createLinearGradient(curX - 20, 0, curX + 2, 0);
-    grad.addColorStop(0, 'transparent');
-    grad.addColorStop(1, dotCol);
-    ctx.strokeStyle = grad;
-    ctx.lineWidth = 1;
-    ctx.globalAlpha = 0.5;
-    ctx.beginPath(); ctx.moveTo(curX, 0); ctx.lineTo(curX, H); ctx.stroke();
-    ctx.globalAlpha = 1;
-
-    // Circuit node dots at intersections
-    [0.16, 0.33, 0.5, 0.66, 0.83].forEach(xf => {
-      [0.25, 0.5, 0.75].forEach(yf => {
-        ctx.fillStyle = lineCol;
-        ctx.fillRect(W * xf - 1, H * yf - 1, 2, 2);
-      });
+    const curX=(t*1.5)%W;
+    const grad=ctx.createLinearGradient(curX-20,0,curX+2,0);
+    grad.addColorStop(0,'transparent'); grad.addColorStop(1,dotCol);
+    ctx.strokeStyle=grad; ctx.lineWidth=1; ctx.globalAlpha=0.5;
+    ctx.beginPath();ctx.moveTo(curX,0);ctx.lineTo(curX,H);ctx.stroke();ctx.globalAlpha=1;
+    [0.16,0.33,0.5,0.66,0.83].forEach(xf=>{
+      [0.25,0.5,0.75].forEach(yf=>{ ctx.fillStyle=lineCol; ctx.fillRect(W*xf-1,H*yf-1,2,2); });
     });
-
-    t++;
-    requestAnimationFrame(draw);
+    t++; requestAnimationFrame(draw);
   }
   draw();
 }
@@ -1125,84 +1327,43 @@ function initExamCell() {
   const canvas = document.getElementById('cv-examcell');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-
   function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
-  resize();
-  window.addEventListener('resize', resize);
-
+  resize(); window.addEventListener('resize', resize);
   function getNodes() {
     const W = canvas.width, H = canvas.height;
     return [
-      { x: W*0.08, y: H*0.5,   label: 'Input' },
-      { x: W*0.28, y: H*0.25,  label: 'Validate' },
-      { x: W*0.28, y: H*0.75,  label: 'Schedule' },
-      { x: W*0.55, y: H*0.25,  label: 'Generate' },
-      { x: W*0.55, y: H*0.75,  label: 'Assign' },
-      { x: W*0.78, y: H*0.5,   label: 'Notify' },
-      { x: W*0.95, y: H*0.5,   label: 'Done' },
+      {x:W*0.08,y:H*0.5},{x:W*0.28,y:H*0.25},{x:W*0.28,y:H*0.75},
+      {x:W*0.55,y:H*0.25},{x:W*0.55,y:H*0.75},{x:W*0.78,y:H*0.5},{x:W*0.95,y:H*0.5},
     ];
   }
-  const edgeIdx = [[0,1],[0,2],[1,3],[2,4],[3,5],[4,5],[5,6]];
-
+  const edgeIdx=[[0,1],[0,2],[1,3],[2,4],[3,5],[4,5],[5,6]];
   class FlowParticle {
-    constructor(from, to) {
-      this.from = from; this.to = to; this.t = Math.random();
-      this.speed = 0.005 + Math.random() * 0.004;
-    }
-    update() { this.t += this.speed; if (this.t > 1) this.t = 0; }
+    constructor(from,to){this.from=from;this.to=to;this.t=Math.random();this.speed=0.005+Math.random()*0.004;}
+    update(){this.t+=this.speed;if(this.t>1)this.t=0;}
   }
-  const particles = [];
-  edgeIdx.forEach(([a, b]) => {
-    for (let i = 0; i < 2; i++) particles.push(new FlowParticle(a, b));
-  });
-
-  let t = 0;
-  function draw() {
-    const W = canvas.width, H = canvas.height;
-    ctx.clearRect(0, 0, W, H);
-    const nodes = getNodes();
-    const lineCol = getCSSVar('--canvas-line');
-    const dotCol  = getCSSVar('--canvas-dot');
-
-    // Edges
-    edgeIdx.forEach(([a, b]) => {
-      ctx.strokeStyle = lineCol;
-      ctx.lineWidth = 0.75;
-      ctx.beginPath();
-      ctx.moveTo(nodes[a].x, nodes[a].y);
-      ctx.lineTo(nodes[b].x, nodes[b].y);
-      ctx.stroke();
-    });
-
-    // Particles
-    particles.forEach(p => {
+  const particles=[];
+  edgeIdx.forEach(([a,b])=>{for(let i=0;i<2;i++)particles.push(new FlowParticle(a,b));});
+  let t=0;
+  function draw(){
+    const W=canvas.width,H=canvas.height;
+    ctx.clearRect(0,0,W,H);
+    const nodes=getNodes();
+    const lineCol=getCSSVar('--canvas-line'),dotCol=getCSSVar('--canvas-dot');
+    edgeIdx.forEach(([a,b])=>{ctx.strokeStyle=lineCol;ctx.lineWidth=0.75;ctx.beginPath();ctx.moveTo(nodes[a].x,nodes[a].y);ctx.lineTo(nodes[b].x,nodes[b].y);ctx.stroke();});
+    particles.forEach(p=>{
       p.update();
-      const from = nodes[p.from], to = nodes[p.to];
-      const px = from.x + (to.x - from.x) * p.t;
-      const py = from.y + (to.y - from.y) * p.t;
-      ctx.fillStyle = dotCol;
-      ctx.globalAlpha = 0.75;
-      ctx.beginPath(); ctx.arc(px, py, 1.8, 0, Math.PI*2); ctx.fill();
-      ctx.globalAlpha = 1;
+      const from=nodes[p.from],to=nodes[p.to];
+      const px=from.x+(to.x-from.x)*p.t,py=from.y+(to.y-from.y)*p.t;
+      ctx.fillStyle=dotCol;ctx.globalAlpha=0.75;ctx.beginPath();ctx.arc(px,py,1.8,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
     });
-
-    // Nodes
-    nodes.forEach((n, i) => {
-      const pulse = 1 + 0.12 * Math.sin(t * 0.03 + i * 0.9);
-      const r = (i === 0 || i === 6 ? 5 : 4) * pulse;
-      ctx.fillStyle = getCSSVar('--surface2');
-      ctx.strokeStyle = lineCol;
-      ctx.lineWidth = 0.75;
-      ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, Math.PI*2);
-      ctx.fill(); ctx.stroke();
-      ctx.fillStyle = dotCol;
-      ctx.globalAlpha = 0.55;
-      ctx.beginPath(); ctx.arc(n.x, n.y, 1.5, 0, Math.PI*2); ctx.fill();
-      ctx.globalAlpha = 1;
+    nodes.forEach((n,i)=>{
+      const pulse=1+0.12*Math.sin(t*0.03+i*0.9);
+      const r=(i===0||i===6?5:4)*pulse;
+      ctx.fillStyle=getCSSVar('--surface2');ctx.strokeStyle=lineCol;ctx.lineWidth=0.75;
+      ctx.beginPath();ctx.arc(n.x,n.y,r,0,Math.PI*2);ctx.fill();ctx.stroke();
+      ctx.fillStyle=dotCol;ctx.globalAlpha=0.55;ctx.beginPath();ctx.arc(n.x,n.y,1.5,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
     });
-
-    t++;
-    requestAnimationFrame(draw);
+    t++;requestAnimationFrame(draw);
   }
   draw();
 }
