@@ -63,6 +63,7 @@ body.cursor-enabled.cursor-text  #cursor-ring { width: 22px; height: 22px; borde
   --focus-ring: rgba(255,255,255,0.5);
   --accent-green: #4ade80; --accent-green-dim: rgba(74,222,128,0.15);
   --wip-bg: rgba(255,200,80,0.06); --wip-border: rgba(255,200,80,0.2); --wip-text: #fbbf24;
+  --term-bg: #0d1117; --term-green: #39d353; --term-yellow: #e3b341; --term-blue: #58a6ff; --term-red: #f85149;
 }
 [data-theme="light"] {
   --bg: #f7f7f5; --surface: #ffffff; --surface2: #f0f0ee;
@@ -75,6 +76,7 @@ body.cursor-enabled.cursor-text  #cursor-ring { width: 22px; height: 22px; borde
   --focus-ring: rgba(0,0,0,0.45);
   --accent-green: #16a34a; --accent-green-dim: rgba(22,163,74,0.10);
   --wip-bg: rgba(180,130,0,0.06); --wip-border: rgba(180,130,0,0.2); --wip-text: #92400e;
+  --term-bg: #1a1f2e; --term-green: #39d353; --term-yellow: #e3b341; --term-blue: #58a6ff; --term-red: #f85149;
 }
 
 :focus-visible { outline: 1.5px solid var(--focus-ring); outline-offset: 3px; border-radius: 4px; }
@@ -177,8 +179,6 @@ body.show-keys .tab-key { opacity: 1; }
 body.cursor-enabled .toggle { cursor: none; }
 .toggle:hover { color: var(--text); background: var(--clickable-glow); border-color: var(--border2); }
 .toggle.active { border-color: var(--border2); color: var(--text); background: var(--clickable-glow); }
-
-/* Cursor toggle specific */
 #cursorToggle .cursor-icon { font-size: 13px; }
 
 /* ─── SKIP LINK ─── */
@@ -405,22 +405,51 @@ p.body strong { color: var(--text); font-weight: 500; }
 body.cursor-enabled .print-btn { cursor: none; }
 .print-btn:hover { color: var(--text); border-color: var(--border2); background: var(--clickable-glow); }
 
-/* ─── KEYBOARD NAV HINT ─── */
-.kbd-hint {
+/* ─── KEYBOARD HELP PANEL ─── */
+.kbd-panel {
+  position: fixed; bottom: 20px; right: 20px;
+  z-index: 8000;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 14px 16px;
+  min-width: 220px;
+  opacity: 0; pointer-events: none;
+  transform: translateY(6px);
+  transition: opacity 0.22s ease, transform 0.22s cubic-bezier(.22,1,.36,1);
+  font-size: 11.5px;
+}
+.kbd-panel.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+.kbd-panel-title {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
+}
+.kbd-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 3px 0; gap: 12px;
+}
+.kbd-row + .kbd-row { border-top: 1px solid var(--border); }
+.kbd-desc { color: var(--sub); font-size: 11px; }
+.kbd-keys { display: flex; gap: 3px; flex-shrink: 0; }
+kbd {
+  font-family: monospace; font-size: 9.5px;
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 3px; padding: 1.5px 5px; color: var(--text);
+  white-space: nowrap;
+}
+
+/* ─── KEYBOARD HINT TOAST (brief) ─── */
+.kbd-hint-toast {
   position: fixed; bottom: 20px; right: 20px;
   font-size: 10.5px; color: var(--muted);
   background: var(--surface); border: 1px solid var(--border);
   border-radius: 5px; padding: 6px 10px;
-  z-index: 8000; opacity: 0;
+  z-index: 7999; opacity: 0;
   transition: opacity 0.3s;
   pointer-events: none;
 }
-.kbd-hint.visible { opacity: 1; }
-.kbd-hint kbd {
-  font-family: monospace; font-size: 10px;
-  background: var(--tag-bg); border: 1px solid var(--border);
-  border-radius: 2px; padding: 1px 4px; margin: 0 2px;
-}
+.kbd-hint-toast.visible { opacity: 1; }
+.kbd-hint-toast kbd { font-family: monospace; font-size: 10px; background: var(--tag-bg); border: 1px solid var(--border); border-radius: 2px; padding: 1px 4px; margin: 0 2px; }
 
 /* ─── MOBILE BOTTOM NAV ─── */
 .mobile-nav {
@@ -463,14 +492,14 @@ body.cursor-enabled .print-btn { cursor: none; }
   .project-visual { height: 130px; }
   .project-card:hover .project-visual { height: 138px; }
   .mobile-nav { display: block; }
-  .kbd-hint { display: none; }
+  .kbd-panel, .kbd-hint-toast { display: none; }
 }
 
 /* ─── PRINT ─── */
 @media print {
   body { display: block; overflow: visible; background: white; color: black; }
   .blob-wrap, .sidebar, #profile, #projects, #skills, #contact,
-  #cursor-ring, #cursor-dot, #scroll-progress, .mobile-nav, .kbd-hint { display: none !important; }
+  #cursor-ring, #cursor-dot, #scroll-progress, .mobile-nav, .kbd-panel, .kbd-hint-toast { display: none !important; }
   #resume { display: block !important; max-width: 100%; padding: 0; }
   #resume .resume-wrap { color: #333; }
   #resume .r-name { color: black; }
@@ -488,8 +517,22 @@ body.cursor-enabled .print-btn { cursor: none; }
 <a class="skip-link" href="#mainScroll">Skip to content</a>
 <div id="scroll-progress" aria-hidden="true"></div>
 
-<div class="kbd-hint" id="kbdHint">
-  <kbd>1</kbd>–<kbd>6</kbd> navigate · <kbd>↑↓</kbd> scroll · <kbd>?</kbd> toggle keys
+<!-- KEYBOARD HELP PANEL -->
+<div class="kbd-panel" id="kbdPanel" role="dialog" aria-label="Keyboard shortcuts">
+  <div class="kbd-panel-title">Keyboard Shortcuts</div>
+  <div class="kbd-row"><span class="kbd-desc">Navigate sections</span><span class="kbd-keys"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd><kbd>5</kbd><kbd>6</kbd></span></div>
+  <div class="kbd-row"><span class="kbd-desc">Next / prev section</span><span class="kbd-keys"><kbd>→</kbd><kbd>←</kbd></span></div>
+  <div class="kbd-row"><span class="kbd-desc">Scroll up / down</span><span class="kbd-keys"><kbd>↑</kbd><kbd>↓</kbd></span></div>
+  <div class="kbd-row"><span class="kbd-desc">Page up / down</span><span class="kbd-keys"><kbd>PgUp</kbd><kbd>PgDn</kbd></span></div>
+  <div class="kbd-row"><span class="kbd-desc">First / last section</span><span class="kbd-keys"><kbd>Home</kbd><kbd>End</kbd></span></div>
+  <div class="kbd-row"><span class="kbd-desc">Toggle theme</span><span class="kbd-keys"><kbd>T</kbd></span></div>
+  <div class="kbd-row"><span class="kbd-desc">Toggle key hints</span><span class="kbd-keys"><kbd>?</kbd></span></div>
+  <div class="kbd-row"><span class="kbd-desc">Close this panel</span><span class="kbd-keys"><kbd>Esc</kbd></span></div>
+</div>
+
+<!-- BRIEF HINT TOAST -->
+<div class="kbd-hint-toast" id="kbdToast">
+  Press <kbd>?</kbd> for keyboard shortcuts
 </div>
 
 <div class="blob-wrap" aria-hidden="true">
@@ -502,7 +545,7 @@ body.cursor-enabled .print-btn { cursor: none; }
 <aside class="sidebar" role="navigation" aria-label="Site navigation">
   <div class="sidebar-name">Vishwesh Bhilare</div>
   <div class="sidebar-role">Computer Engineering · MMCOE</div>
-  <div class="status"><span class="status-dot"></span>Open to opportunities</div>
+  <div class="status"><span class="status-dot"></span>Seeking Summer 2026 internship</div>
 
   <nav role="tablist" aria-label="Sections">
     <button class="tab active" data-panel="profile"  role="tab" aria-selected="true"  aria-controls="profile"  tabindex="0"><span class="tab-dot"></span>Profile  <span class="tab-key">1</span></button>
@@ -540,7 +583,7 @@ body.cursor-enabled .print-btn { cursor: none; }
 
     <div class="seeking-badge">
       <span class="seeking-dot"></span>
-      <span>Looking for: <strong>Systems · Infra · R&amp;D · Pipelines</strong> internships — Summer 2026</span>
+      <span>Seeking: <strong>Systems · Infra · R&amp;D · Pipelines</strong> internships — Summer 2026</span>
     </div>
 
     <!-- Currently Working -->
@@ -977,7 +1020,6 @@ body.cursor-enabled .print-btn { cursor: none; }
 
     <div class="label" style="margin-top: 32px; margin-bottom: 12px;">Participation & Appreciation</div>
     <div class="cert-grid" id="extraCertGrid">
-      <!-- Add your participation / appreciation certs here as you collect them -->
       <div class="cert-item" style="opacity: 0.5; pointer-events: none; border-style: dashed;">
         <div class="cert-item-left">
           <div class="cert-item-name">More certificates coming soon</div>
@@ -1025,7 +1067,8 @@ body.cursor-enabled .print-btn { cursor: none; }
 const html     = document.documentElement;
 const mainEl   = document.getElementById('mainScroll');
 const progress = document.getElementById('scroll-progress');
-const kbdHint  = document.getElementById('kbdHint');
+const kbdPanel = document.getElementById('kbdPanel');
+const kbdToast = document.getElementById('kbdToast');
 
 /* ── CUSTOM CURSOR (OPT-IN) ── */
 const ring = document.getElementById('cursor-ring');
@@ -1058,7 +1101,6 @@ cursorToggleBtn.addEventListener('click', () => {
   if (cursorEnabled) disableCursor(); else enableCursor();
 });
 
-// Restore preference
 try {
   if (localStorage.getItem('vb-cursor') === '1') enableCursor();
 } catch(e){}
@@ -1115,7 +1157,11 @@ function switchPanel(name) {
   const currentPanel = document.querySelector('.panel.active');
   if (currentPanel && currentPanel.id === name) return;
 
-  tabs.forEach(t => { t.classList.toggle('active', t.dataset.panel === name); t.setAttribute('aria-selected', t.dataset.panel === name); t.tabIndex = t.dataset.panel === name ? 0 : -1; });
+  tabs.forEach(t => {
+    t.classList.toggle('active', t.dataset.panel === name);
+    t.setAttribute('aria-selected', t.dataset.panel === name);
+    t.tabIndex = t.dataset.panel === name ? 0 : -1;
+  });
   mobileTabs.forEach(t => t.classList.toggle('active', t.dataset.panel === name));
 
   panels.forEach(p => {
@@ -1137,43 +1183,108 @@ tabs.forEach(t => t.addEventListener('click', () => switchPanel(t.dataset.panel)
 mobileTabs.forEach(t => t.addEventListener('click', () => switchPanel(t.dataset.panel)));
 
 /* ── KEYBOARD NAVIGATION ── */
-let kbdHintTimeout;
+let kbdPanelOpen = false;
+let toastTimeout;
+let firstVisit = true;
+
+function showToast(msg, duration) {
+  clearTimeout(toastTimeout);
+  kbdToast.innerHTML = msg || 'Press <kbd>?</kbd> for keyboard shortcuts';
+  kbdToast.classList.add('visible');
+  toastTimeout = setTimeout(() => kbdToast.classList.remove('visible'), duration || 2200);
+}
+
+function toggleKbdPanel() {
+  kbdPanelOpen = !kbdPanelOpen;
+  kbdPanel.classList.toggle('visible', kbdPanelOpen);
+  document.body.classList.toggle('show-keys', kbdPanelOpen);
+  if (kbdPanelOpen) {
+    clearTimeout(toastTimeout);
+    kbdToast.classList.remove('visible');
+  }
+}
+
+// Show hint toast briefly on load
+setTimeout(() => showToast('Press <kbd>?</kbd> for keyboard shortcuts', 3500), 1800);
+
 document.addEventListener('keydown', e => {
   const key = e.key;
+  const target = document.activeElement;
+  const inInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA';
 
-  if (['1','2','3','4','5','6'].includes(key) && !e.ctrlKey && !e.metaKey && !e.altKey) {
-    const target = document.activeElement;
-    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
-    switchPanel(PANELS[+key - 1]);
-    if (tabs[+key - 1]) tabs[+key - 1].focus();
+  // Escape closes panel
+  if (key === 'Escape') {
+    if (kbdPanelOpen) { toggleKbdPanel(); return; }
+  }
+
+  // ? toggles help panel
+  if (key === '?' && !inInput) {
+    toggleKbdPanel();
     return;
   }
 
+  // Number keys 1-6 switch panels
+  if (['1','2','3','4','5','6'].includes(key) && !e.ctrlKey && !e.metaKey && !e.altKey && !inInput) {
+    const idx = +key - 1;
+    switchPanel(PANELS[idx]);
+    if (tabs[idx]) tabs[idx].focus();
+    showToast(`Section ${key} · <strong>${PANELS[idx].charAt(0).toUpperCase()+PANELS[idx].slice(1)}</strong>`, 1200);
+    return;
+  }
+
+  // Arrow left/right to cycle panels
+  if ((key === 'ArrowRight' || key === 'ArrowLeft') && !e.target.closest('nav') && !inInput) {
+    const cur = PANELS.indexOf(document.querySelector('.panel.active')?.id);
+    let next = key === 'ArrowRight' ? cur + 1 : cur - 1;
+    next = Math.max(0, Math.min(PANELS.length - 1, next));
+    if (next !== cur) {
+      switchPanel(PANELS[next]);
+      tabs[next].focus();
+      showToast(`<kbd>←</kbd><kbd>→</kbd> to navigate sections`, 1200);
+    }
+    return;
+  }
+
+  // Arrow keys in nav (up/down)
   if (e.target.closest('nav')) {
     const activeTab = document.querySelector('.tab.active');
     const idx = tabs.indexOf(activeTab);
     if (key === 'ArrowDown' && idx < tabs.length - 1) { e.preventDefault(); tabs[idx+1].focus(); switchPanel(tabs[idx+1].dataset.panel); }
-    if (key === 'ArrowUp'   && idx > 0)                { e.preventDefault(); tabs[idx-1].focus(); switchPanel(tabs[idx-1].dataset.panel); }
+    if (key === 'ArrowUp'   && idx > 0)               { e.preventDefault(); tabs[idx-1].focus(); switchPanel(tabs[idx-1].dataset.panel); }
     if (key === 'Home') { e.preventDefault(); tabs[0].focus(); switchPanel(tabs[0].dataset.panel); }
     if (key === 'End')  { e.preventDefault(); tabs[tabs.length-1].focus(); switchPanel(tabs[tabs.length-1].dataset.panel); }
+    return;
   }
 
-  if (key === 'ArrowDown' && !e.target.closest('nav')) mainEl.scrollBy({ top: 80, behavior: 'smooth' });
-  if (key === 'ArrowUp'   && !e.target.closest('nav')) mainEl.scrollBy({ top: -80, behavior: 'smooth' });
-  if (key === 'PageDown') mainEl.scrollBy({ top: 400, behavior: 'smooth' });
-  if (key === 'PageUp')   mainEl.scrollBy({ top: -400, behavior: 'smooth' });
+  // Scroll with arrows
+  if (key === 'ArrowDown') mainEl.scrollBy({ top: 80, behavior: 'smooth' });
+  if (key === 'ArrowUp')   mainEl.scrollBy({ top: -80, behavior: 'smooth' });
+  if (key === 'PageDown')  mainEl.scrollBy({ top: 400, behavior: 'smooth' });
+  if (key === 'PageUp')    mainEl.scrollBy({ top: -400, behavior: 'smooth' });
+  if (key === 'Home' && !e.target.closest('nav')) mainEl.scrollTo({ top: 0, behavior: 'smooth' });
+  if (key === 'End'  && !e.target.closest('nav')) mainEl.scrollTo({ top: mainEl.scrollHeight, behavior: 'smooth' });
 
-  if (key === '?') {
-    document.body.classList.toggle('show-keys');
-    kbdHint.classList.add('visible');
-    clearTimeout(kbdHintTimeout);
-    kbdHintTimeout = setTimeout(() => kbdHint.classList.remove('visible'), 3000);
+  // T toggles theme
+  if (key === 't' || key === 'T') {
+    if (!inInput) {
+      const dark = html.dataset.theme === 'dark';
+      html.dataset.theme = dark ? 'light' : 'dark';
+      togIco.textContent = dark ? '☾' : '☀';
+      togLbl.textContent = dark ? 'Dark' : 'Light';
+      showToast(`Theme: <strong>${dark ? 'Light' : 'Dark'}</strong>`, 1200);
+    }
   }
 
+  // Tab key — show toast briefly
   if (key === 'Tab') {
-    kbdHint.classList.add('visible');
-    clearTimeout(kbdHintTimeout);
-    kbdHintTimeout = setTimeout(() => kbdHint.classList.remove('visible'), 2500);
+    showToast('Press <kbd>?</kbd> for all shortcuts', 2000);
+  }
+});
+
+// Close panel on outside click
+document.addEventListener('click', e => {
+  if (kbdPanelOpen && !kbdPanel.contains(e.target) && e.target.id !== 'kbdToast') {
+    toggleKbdPanel();
   }
 });
 
@@ -1213,7 +1324,9 @@ function initCanvases() {
   initExamCell();
 }
 
-/* ── SceneForge ── */
+/* ════════════════════════════════════════
+   SceneForge canvas (UNCHANGED)
+════════════════════════════════════════ */
 function initSceneForge() {
   const canvas = document.getElementById('cv-sceneforge');
   if (!canvas) return;
@@ -1221,114 +1334,75 @@ function initSceneForge() {
   function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
   resize(); window.addEventListener('resize', resize);
 
-  // Pipeline stages matching actual SceneForge: detect → segment → track → reconstruct → inpaint
-  // We animate left-to-right processing stages across the canvas
-  let t = 0;
-
-  // Simulated "player" silhouettes as simple rect+ellipse combos
   const players = [
-    { bx: 0.22, by: 0.32, bw: 0.055, bh: 0.55, phase: 0 },   // player 1
-    { bx: 0.48, by: 0.28, bw: 0.050, bh: 0.52, phase: 1.4 },  // player 2
-    { bx: 0.68, by: 0.36, bw: 0.048, bh: 0.50, phase: 2.8 },  // player 3
+    { bx: 0.22, by: 0.32, bw: 0.055, bh: 0.55, phase: 0 },
+    { bx: 0.48, by: 0.28, bw: 0.050, bh: 0.52, phase: 1.4 },
+    { bx: 0.68, by: 0.36, bw: 0.048, bh: 0.50, phase: 2.8 },
   ];
 
-  // Field lines (simplified top-down view)
+  let t = 0;
+
   function drawField(W, H, alpha) {
     ctx.globalAlpha = alpha;
     const isDark = html.dataset.theme === 'dark';
-    const grassColor = isDark ? 'rgba(30,60,30,0.9)' : 'rgba(60,120,50,0.8)';
-    const lineColor  = isDark ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.55)';
-
-    // Grass
-    ctx.fillStyle = grassColor;
+    ctx.fillStyle = isDark ? 'rgba(30,60,30,0.9)' : 'rgba(60,120,50,0.8)';
     ctx.fillRect(0, 0, W, H);
-
-    // Alternating stripe bands
     for (let i = 0; i < 6; i++) {
       if (i % 2 === 0) {
         ctx.fillStyle = isDark ? 'rgba(35,70,35,0.6)' : 'rgba(70,140,60,0.4)';
         ctx.fillRect(i * W/6, 0, W/6, H);
       }
     }
-
-    // White lines
+    const lineColor = isDark ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.55)';
     ctx.strokeStyle = lineColor; ctx.lineWidth = 1.5;
-    // Centre line
     ctx.beginPath(); ctx.moveTo(W/2, 0); ctx.lineTo(W/2, H); ctx.stroke();
-    // Centre circle
     ctx.beginPath(); ctx.arc(W/2, H/2, H*0.28, 0, Math.PI*2); ctx.stroke();
-    // Outer border
     ctx.strokeRect(W*0.04, H*0.06, W*0.92, H*0.88);
-    // Left penalty box
     ctx.strokeRect(W*0.04, H*0.22, W*0.14, H*0.56);
-    // Right penalty box
     ctx.strokeRect(W*0.82, H*0.22, W*0.14, H*0.56);
-
     ctx.globalAlpha = 1;
   }
 
-  // Draw a player shape at normalised coords
-  function drawPlayer(W, H, p, style, alpha, maskAlpha, scanProgress) {
-    const x = p.bx * W, y = p.by * H;
-    const w = p.bw * W, h = p.bh * H;
-
+  function drawPlayer(W, H, p, style, alpha, maskAlpha) {
+    const x = p.bx * W, y = p.by * H, w = p.bw * W, h = p.bh * H;
+    const isDark = html.dataset.theme === 'dark';
     if (style === 'bbox') {
-      // YOLO bounding box
       ctx.globalAlpha = alpha;
       ctx.strokeStyle = '#ffdd00'; ctx.lineWidth = 1.5;
       ctx.strokeRect(x, y, w, h);
-      // Confidence label
       ctx.fillStyle = '#ffdd00';
       ctx.font = `bold ${Math.max(7, W*0.012)}px monospace`;
       ctx.textAlign = 'left';
       ctx.fillText('player 0.94', x, y - 3);
       ctx.globalAlpha = 1;
     } else if (style === 'mask') {
-      // SAM segmentation mask overlay
-      const isDark = html.dataset.theme === 'dark';
       ctx.globalAlpha = maskAlpha;
       ctx.fillStyle = isDark ? 'rgba(255,80,80,0.45)' : 'rgba(220,50,50,0.35)';
-      // Slightly irregular polygon to look like a real mask
       ctx.beginPath();
       ctx.moveTo(x + w*0.15, y + h*0.05);
       ctx.bezierCurveTo(x + w*0.5, y - h*0.03, x + w*0.85, y + h*0.08, x + w*0.9, y + h*0.4);
       ctx.bezierCurveTo(x + w*0.95, y + h*0.7, x + w*0.75, y + h*1.02, x + w*0.45, y + h*1.0);
       ctx.bezierCurveTo(x + w*0.15, y + h*0.98, x - w*0.05, y + h*0.75, x + w*0.05, y + h*0.4);
-      ctx.closePath();
-      ctx.fill();
-      // Mask outline
+      ctx.closePath(); ctx.fill();
       ctx.globalAlpha = maskAlpha * 0.9;
       ctx.strokeStyle = isDark ? 'rgba(255,100,100,0.8)' : 'rgba(200,50,50,0.7)';
-      ctx.lineWidth = 1;
-      ctx.stroke();
-      ctx.globalAlpha = 1;
+      ctx.lineWidth = 1; ctx.stroke(); ctx.globalAlpha = 1;
     } else if (style === 'removed') {
-      // After removal: show reconstructed background patch with subtle grid
-      const isDark = html.dataset.theme === 'dark';
       ctx.globalAlpha = alpha * 0.85;
-      // Reconstructed patch (slightly different green to show it's filled)
       ctx.fillStyle = isDark ? 'rgba(40,80,40,0.9)' : 'rgba(65,130,55,0.85)';
       ctx.beginPath();
       ctx.moveTo(x + w*0.15, y + h*0.05);
       ctx.bezierCurveTo(x + w*0.5, y - h*0.03, x + w*0.85, y + h*0.08, x + w*0.9, y + h*0.4);
       ctx.bezierCurveTo(x + w*0.95, y + h*0.7, x + w*0.75, y + h*1.02, x + w*0.45, y + h*1.0);
       ctx.bezierCurveTo(x + w*0.15, y + h*0.98, x - w*0.05, y + h*0.75, x + w*0.05, y + h*0.4);
-      ctx.closePath();
-      ctx.fill();
-      // Fine texture lines to imply inpainting
+      ctx.closePath(); ctx.fill();
       ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.15)';
       ctx.lineWidth = 0.5;
-      for (let li = 0; li < 5; li++) {
-        ctx.beginPath();
-        ctx.moveTo(x + w*0.1, y + h*(0.15 + li*0.18));
-        ctx.lineTo(x + w*0.85, y + h*(0.18 + li*0.17));
-        ctx.stroke();
-      }
+      for (let li = 0; li < 5; li++) { ctx.beginPath(); ctx.moveTo(x + w*0.1, y + h*(0.15 + li*0.18)); ctx.lineTo(x + w*0.85, y + h*(0.18 + li*0.17)); ctx.stroke(); }
       ctx.globalAlpha = 1;
     }
   }
 
-  // Stage labels
   const stages = ['DETECT', 'SEGMENT', 'TRACK', 'RECONSTRUCT', 'INPAINT'];
 
   function draw() {
@@ -1338,52 +1412,25 @@ function initSceneForge() {
     const dotCol = getCSSVar('--canvas-dot');
     const lineCol = getCSSVar('--canvas-line');
 
-    // Full cycle: 300 frames total, each stage gets 60 frames
     const cycle = t % 360;
-    const stage = Math.floor(cycle / 72); // 0-4
-    const stageT = (cycle % 72) / 72;    // 0→1 within stage
+    const stage = Math.floor(cycle / 72);
+    const stageT = (cycle % 72) / 72;
 
-    // Field is always visible
     drawField(W, H, 1.0);
-
-    // Stage 0: RAW — just the field + raw players (silhouettes)
-    // Stage 1: DETECT — bounding boxes appear
-    // Stage 2: SEGMENT — masks overlay
-    // Stage 3: TRACK — ID labels + motion trail
-    // Stage 4: RECONSTRUCT / INPAINT — players removed, bg filled
 
     players.forEach((p, pi) => {
       const staggerT = Math.max(0, Math.min(1, stageT * 1.5 - pi * 0.15));
-
       if (stage <= 2) {
-        // Draw raw player silhouette
         ctx.globalAlpha = 0.85;
         ctx.fillStyle = isDark ? 'rgba(50,50,80,0.9)' : 'rgba(30,30,70,0.85)';
-        // Body
         ctx.fillRect(p.bx*W + p.bw*W*0.2, p.by*H + p.bh*H*0.1, p.bw*W*0.6, p.bh*H*0.65);
-        // Head
-        ctx.beginPath();
-        ctx.arc(p.bx*W + p.bw*W*0.5, p.by*H + p.bh*H*0.07, p.bw*W*0.28, 0, Math.PI*2);
-        ctx.fill();
+        ctx.beginPath(); ctx.arc(p.bx*W + p.bw*W*0.5, p.by*H + p.bh*H*0.07, p.bw*W*0.28, 0, Math.PI*2); ctx.fill();
         ctx.globalAlpha = 1;
       }
-
-      if (stage === 1) {
-        // Bounding boxes fade in
-        drawPlayer(W, H, p, 'bbox', staggerT, 0, 0);
-      }
-
-      if (stage === 2) {
-        // Masks appear on top of bbox
-        drawPlayer(W, H, p, 'bbox', 0.55, 0, 0);
-        drawPlayer(W, H, p, 'mask', 0, staggerT * 0.85, 0);
-      }
-
+      if (stage === 1) drawPlayer(W, H, p, 'bbox', staggerT, 0);
+      if (stage === 2) { drawPlayer(W, H, p, 'bbox', 0.55, 0); drawPlayer(W, H, p, 'mask', 0, staggerT * 0.85); }
       if (stage === 3) {
-        // Track: show bbox + mask + motion arrow + ID badge
-        drawPlayer(W, H, p, 'bbox', 0.5, 0, 0);
-        drawPlayer(W, H, p, 'mask', 0, 0.55, 0);
-        // Motion trail dots
+        drawPlayer(W, H, p, 'bbox', 0.5, 0); drawPlayer(W, H, p, 'mask', 0, 0.55);
         ctx.globalAlpha = staggerT * 0.7;
         for (let tr = 1; tr <= 4; tr++) {
           const tx = (p.bx + p.bw*0.5)*W - tr * W * 0.022;
@@ -1392,7 +1439,6 @@ function initSceneForge() {
           ctx.beginPath(); ctx.arc(tx, ty, Math.max(1, 2.5 - tr*0.4), 0, Math.PI*2); ctx.fill();
         }
         ctx.globalAlpha = 1;
-        // ID badge
         ctx.globalAlpha = staggerT;
         ctx.fillStyle = isDark ? 'rgba(255,200,60,0.92)' : 'rgba(200,140,0,0.9)';
         const bx = p.bx*W, by = p.by*H, bw = p.bw*W;
@@ -1403,54 +1449,38 @@ function initSceneForge() {
         ctx.fillText(`ID:${pi+1}`, bx + bw/2, by - H*0.02);
         ctx.globalAlpha = 1;
       }
-
       if (stage === 4) {
-        // Reconstruct: show removed region being filled
-        drawPlayer(W, H, p, 'removed', staggerT, 0, 0);
-        // Scan line sweeping across each removed region
+        drawPlayer(W, H, p, 'removed', staggerT, 0);
         const scanX = p.bx*W + staggerT * p.bw*W * 1.2;
         const scanGrad = ctx.createLinearGradient(scanX-8, 0, scanX+8, 0);
         const scanCol = isDark ? 'rgba(80,255,150,0.5)' : 'rgba(30,180,80,0.5)';
         scanGrad.addColorStop(0, 'transparent'); scanGrad.addColorStop(0.5, scanCol); scanGrad.addColorStop(1, 'transparent');
         ctx.strokeStyle = scanGrad; ctx.lineWidth = 1.2; ctx.globalAlpha = staggerT;
-        const py0 = p.by*H - H*0.03, pyH = p.by*H + p.bh*H + H*0.03;
-        ctx.beginPath(); ctx.moveTo(scanX, py0); ctx.lineTo(scanX, pyH); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(scanX, p.by*H - H*0.03); ctx.lineTo(scanX, p.by*H + p.bh*H + H*0.03); ctx.stroke();
         ctx.globalAlpha = 1;
       }
     });
 
-    // Stage label bar at bottom
     const barH = Math.max(18, H * 0.16);
     const barY = H - barH;
     ctx.fillStyle = isDark ? 'rgba(0,0,0,0.55)' : 'rgba(0,0,0,0.35)';
     ctx.fillRect(0, barY, W, barH);
-
     const segW = W / stages.length;
     stages.forEach((label, i) => {
-      const isActive = i === stage;
-      const isPast   = i < stage;
-      const cx = segW * i + segW / 2;
-      const cy = barY + barH / 2;
-
-      // Connector line
+      const isActive = i === stage, isPast = i < stage;
+      const cx = segW * i + segW / 2, cy = barY + barH / 2;
       if (i < stages.length - 1) {
-        ctx.strokeStyle = isPast
-          ? (isDark ? 'rgba(80,220,120,0.6)' : 'rgba(30,160,80,0.6)')
-          : lineCol;
+        ctx.strokeStyle = isPast ? (isDark ? 'rgba(80,220,120,0.6)' : 'rgba(30,160,80,0.6)') : getCSSVar('--canvas-line');
         ctx.lineWidth = 0.8;
         ctx.beginPath(); ctx.moveTo(cx + segW*0.28, cy); ctx.lineTo(cx + segW*0.72, cy); ctx.stroke();
       }
-
-      // Node circle
       const r = Math.max(4, W * 0.012);
       ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2);
       if (isActive) {
-        ctx.fillStyle = isDark ? '#4ade80' : '#16a34a';
-        // Pulse ring
         const pulse = 1 + 0.4 * Math.sin(t * 0.12);
         ctx.globalAlpha = 0.3;
-        ctx.arc(cx, cy, r * pulse * 1.8, 0, Math.PI*2);
-        ctx.fill();
+        ctx.fillStyle = isDark ? '#4ade80' : '#16a34a';
+        ctx.beginPath(); ctx.arc(cx, cy, r * pulse * 1.8, 0, Math.PI*2); ctx.fill();
         ctx.globalAlpha = 1;
         ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2);
         ctx.fillStyle = isDark ? '#4ade80' : '#16a34a';
@@ -1460,75 +1490,176 @@ function initSceneForge() {
         ctx.fillStyle = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.2)';
       }
       ctx.fill();
-
-      // Label
-      ctx.fillStyle = isActive
-        ? (isDark ? '#4ade80' : '#16a34a')
-        : (isPast ? (isDark ? 'rgba(74,222,128,0.7)' : 'rgba(22,163,74,0.6)') : (isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)'));
+      ctx.fillStyle = isActive ? (isDark ? '#4ade80' : '#16a34a') : (isPast ? (isDark ? 'rgba(74,222,128,0.7)' : 'rgba(22,163,74,0.6)') : (isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)'));
       ctx.font = `${isActive ? '600' : '400'} ${Math.max(7, W * 0.0115)}px monospace`;
       ctx.textAlign = 'center';
       ctx.fillText(label, cx, barY + barH * 0.88);
     });
-
-    // Top-right: frame counter / stage info
     ctx.fillStyle = isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.25)';
     ctx.font = `${Math.max(7, W*0.011)}px monospace`;
     ctx.textAlign = 'right';
     ctx.fillText(`frame ${String(t % 9999).padStart(4,'0')}`, W - 8, 14);
-
     t++; requestAnimationFrame(draw);
   }
   draw();
 }
 
-/* ── ReachlyEngine ── */
+/* ════════════════════════════════════════
+   ReachlyEngine — Rich CLI Terminal Mockup
+   Shows: menu → fetch linkedin → persona → message outputs
+════════════════════════════════════════ */
 function initReachly() {
   const canvas = document.getElementById('cv-reachly');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
   resize(); window.addEventListener('resize', resize);
-  function getNodes() {
-    const W = canvas.width, H = canvas.height;
-    return {
-      src:      {x:W*0.12,y:H*0.5},
-      persona:  {x:W*0.45,y:H*0.5},
-      email:    {x:W*0.78,y:H*0.18},
-      whatsapp: {x:W*0.78,y:H*0.39},
-      linkedin: {x:W*0.78,y:H*0.61},
-      insta:    {x:W*0.78,y:H*0.82},
-    };
-  }
-  class Particle {
-    constructor(from, to) { this.from=from; this.to=to; this.t=Math.random(); this.speed=0.004+Math.random()*0.003; }
-    update() { this.t+=this.speed; if(this.t>1) this.t=0; }
-    pos(n) { const a=n[this.from],b=n[this.to]; return {x:a.x+(b.x-a.x)*this.t, y:a.y+(b.y-a.y)*this.t}; }
-  }
-  const edges = [['src','persona'],['persona','email'],['persona','whatsapp'],['persona','linkedin'],['persona','insta']];
-  const particles = [];
-  edges.forEach(([a,b]) => { for(let i=0;i<3;i++) particles.push(new Particle(a,b)); });
+
   let t = 0;
+  // Cycle: 0=menu, 1=fetching, 2=persona, 3=generating, 4=outputs
+  const CYCLE = 320;
+  const PHASE_MENU = 0, PHASE_FETCH = 70, PHASE_PERSONA = 140, PHASE_GEN = 200, PHASE_OUTPUT = 255;
+
+  // Terminal lines to show in each phase
+  const menuLines = [
+    { col: '#58a6ff', text: '  ReachlyEngine v1.0  ', bg: true },
+    { col: '#888', text: '' },
+    { col: '#39d353', text: ' [1] ▶  Fetch & Analyze Profile' },
+    { col: '#888',    text: ' [2]    Generate Message' },
+    { col: '#888',    text: ' [3]    View Personas' },
+    { col: '#888',    text: ' [4]    Exit' },
+    { col: '#888', text: '' },
+    { col: '#e3b341', text: ' › Select: ' },
+  ];
+  const fetchLines = [
+    { col: '#888',    text: '$ reachly fetch --profile linkedin.com/in/target' },
+    { col: '#58a6ff', text: '  Connecting via session cookie...' },
+    { col: '#39d353', text: '  ✓ Profile loaded: Priya Sharma' },
+    { col: '#888',    text: '    Title: Senior ML Engineer @ Google' },
+    { col: '#888',    text: '    Skills: PyTorch, LLMs, distributed sys' },
+    { col: '#888',    text: '    Posts: 12 recent · Activity: High' },
+    { col: '#e3b341', text: '  ⟳ Analyzing with Ollama llama3.2...' },
+  ];
+  const personaLines = [
+    { col: '#39d353', text: '  ✓ Persona stored → personas.db' },
+    { col: '#888', text: '' },
+    { col: '#58a6ff', text: '  Persona: priya_sharma_senior_ml' },
+    { col: '#888',    text: '    Tone:       Technical, direct' },
+    { col: '#888',    text: '    Interests:  MLOps, open-source' },
+    { col: '#888',    text: '    Hook:       Research angle' },
+    { col: '#e3b341', text: '  → Generating outreach messages...' },
+  ];
+  const outputLines = [
+    { col: '#39d353', text: '  ✓ Email        → Ready' },
+    { col: '#39d353', text: '  ✓ LinkedIn DM  → Ready' },
+    { col: '#39d353', text: '  ✓ WhatsApp     → Ready' },
+    { col: '#39d353', text: '  ✓ Instagram    → Ready' },
+    { col: '#888', text: '' },
+    { col: '#888',    text: '  4 channels · 1 persona · 0 cloud APIs' },
+    { col: '#58a6ff', text: '  All messages personalized locally ✓' },
+  ];
+
+  function drawTerminal(W, H) {
+    const isDark = html.dataset.theme === 'dark';
+    const termBg = '#0d1117';
+    const phase = t % CYCLE;
+
+    // Terminal window bg
+    ctx.fillStyle = termBg;
+    ctx.beginPath();
+    ctx.roundRect(0, 0, W, H, 0);
+    ctx.fill();
+
+    // Title bar
+    const barH = Math.max(20, H * 0.14);
+    ctx.fillStyle = '#161b22';
+    ctx.fillRect(0, 0, W, barH);
+
+    // Traffic lights
+    const dots = ['#f85149','#e3b341','#39d353'];
+    dots.forEach((c, i) => {
+      ctx.fillStyle = c; ctx.globalAlpha = 0.8;
+      ctx.beginPath(); ctx.arc(10 + barH*0.3 + i*(barH*0.5), barH/2, Math.max(3, barH*0.22), 0, Math.PI*2); ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.font = `${Math.max(8, W*0.022)}px monospace`;
+    ctx.textAlign = 'center';
+    ctx.fillText('reachly — python3 main.py', W/2, barH * 0.68);
+    ctx.textAlign = 'left';
+
+    // Line rendering
+    const lh = Math.max(11, H * 0.088);
+    const startY = barH + lh * 0.8;
+    const fs = Math.max(8, W * 0.025);
+    ctx.font = `${fs}px 'SF Mono', 'Fira Mono', monospace`;
+
+    let lines = [];
+    if (phase < PHASE_FETCH) {
+      // Show menu, animate cursor blink
+      lines = [...menuLines];
+    } else if (phase < PHASE_PERSONA) {
+      lines = [...menuLines.slice(0,5), { col:'#f0f0f0', text: ' [1]' }, ...fetchLines];
+    } else if (phase < PHASE_GEN) {
+      lines = [...fetchLines, ...personaLines];
+    } else {
+      lines = [...personaLines, ...outputLines];
+    }
+
+    // Scroll effect: show last N lines that fit
+    const maxLines = Math.floor((H - barH - lh) / lh);
+    const visible = lines.slice(-maxLines);
+    const reveal = phase < PHASE_FETCH ? (phase / PHASE_FETCH) : 1;
+
+    visible.forEach((line, i) => {
+      const y = startY + i * lh;
+      if (y > H - 4) return;
+      ctx.fillStyle = line.col || '#888';
+      ctx.globalAlpha = Math.min(1, reveal + i * 0.05);
+      if (line.bg) {
+        ctx.fillStyle = '#1f2937';
+        ctx.fillRect(4, y - lh*0.75, W - 8, lh);
+        ctx.fillStyle = '#58a6ff';
+      }
+      ctx.fillText(line.text, 8, y);
+      ctx.globalAlpha = 1;
+    });
+
+    // Blinking cursor at prompt
+    const inMenu = phase < PHASE_FETCH;
+    if (inMenu && Math.floor(t * 0.04) % 2 === 0) {
+      ctx.fillStyle = '#f0f0f0';
+      ctx.globalAlpha = 0.8;
+      const cursorY = startY + Math.min(visible.length - 1, menuLines.length - 1) * lh;
+      const lastLine = menuLines[menuLines.length - 1].text;
+      ctx.font = `${fs}px 'SF Mono', 'Fira Mono', monospace`;
+      const tw = ctx.measureText(lastLine).width;
+      ctx.fillRect(8 + tw, cursorY - lh*0.7, Math.max(5, W*0.012), lh * 0.8);
+      ctx.globalAlpha = 1;
+    }
+
+    // Progress spinner during fetch/gen
+    if (phase >= PHASE_FETCH && phase < PHASE_PERSONA || phase >= PHASE_GEN && phase < PHASE_OUTPUT) {
+      const spin = ['⠋','⠙','⠸','⠴','⠦','⠇'][Math.floor(t * 0.15) % 6];
+      ctx.fillStyle = '#e3b341';
+      ctx.globalAlpha = 0.9;
+      ctx.fillText(spin, 8, H - 8);
+      ctx.globalAlpha = 1;
+    }
+  }
+
   function draw() {
     const W = canvas.width, H = canvas.height;
-    ctx.clearRect(0,0,W,H);
-    const nodes = getNodes();
-    const lineCol = getCSSVar('--canvas-line'), dotCol = getCSSVar('--canvas-dot');
-    edges.forEach(([a,b]) => { ctx.strokeStyle=lineCol; ctx.lineWidth=0.75; ctx.beginPath(); ctx.moveTo(nodes[a].x,nodes[a].y); ctx.lineTo(nodes[b].x,nodes[b].y); ctx.stroke(); });
-    particles.forEach(p => { p.update(); const pos=p.pos(nodes); ctx.globalAlpha=0.7; ctx.fillStyle=dotCol; ctx.beginPath(); ctx.arc(pos.x,pos.y,1.8,0,Math.PI*2); ctx.fill(); });
-    ctx.globalAlpha=1;
-    Object.entries(nodes).forEach(([key,n]) => {
-      const pulse=1+0.15*Math.sin(t*0.04+n.x*0.01);
-      const r=(key==='persona'?6:4)*pulse;
-      ctx.fillStyle=getCSSVar('--surface2'); ctx.strokeStyle=lineCol; ctx.lineWidth=1;
-      ctx.beginPath(); ctx.arc(n.x,n.y,r,0,Math.PI*2); ctx.fill(); ctx.stroke();
-      ctx.fillStyle=dotCol; ctx.globalAlpha=0.6; ctx.beginPath(); ctx.arc(n.x,n.y,1.5,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1;
-    });
+    ctx.clearRect(0, 0, W, H);
+    drawTerminal(W, H);
     t++; requestAnimationFrame(draw);
   }
   draw();
 }
 
-/* ── Mesh ── */
+/* ════════════════════════════════════════
+   Resilient Offline Mesh (ORIGINAL - unchanged logic, kept)
+════════════════════════════════════════ */
 function initMesh() {
   const canvas = document.getElementById('cv-mesh');
   if (!canvas) return;
@@ -1577,72 +1708,458 @@ function initMesh() {
   draw();
 }
 
-/* ── XGestura ── */
+/* ════════════════════════════════════════
+   XGestura — Glove + IMU Pipeline Diagram
+   Glove silhouette with finger sensors → ESP32 chip → BT arc → cursor/keyboard
+════════════════════════════════════════ */
 function initXGestura() {
   const canvas = document.getElementById('cv-xgestura');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
   resize(); window.addEventListener('resize', resize);
-  const channels = [{freq:0.018,amp:0.28,phase:0},{freq:0.024,amp:0.20,phase:2.1},{freq:0.013,amp:0.16,phase:4.3}];
+
   let t = 0;
+
+  // Finger sensor pulse timing
+  const fingerPhases = [0, 0.8, 1.6, 2.4, 3.2];
+
+  function drawGlove(cx, cy, scale, t, isDark) {
+    const s = scale;
+    // Palm
+    ctx.fillStyle = isDark ? '#1e293b' : '#dbeafe';
+    ctx.strokeStyle = isDark ? 'rgba(96,165,250,0.6)' : 'rgba(37,99,235,0.5)';
+    ctx.lineWidth = 1.2;
+
+    ctx.beginPath();
+    ctx.ellipse(cx, cy + s*0.1, s*0.55, s*0.72, 0, 0, Math.PI*2);
+    ctx.fill(); ctx.stroke();
+
+    // Fingers (5)
+    const fingerDefs = [
+      { angle: -0.62, len: 1.10, w: 0.18, base: 0.45 }, // thumb
+      { angle: -0.28, len: 1.20, w: 0.17, base: 0.62 }, // index
+      { angle: -0.02, len: 1.30, w: 0.17, base: 0.68 }, // middle
+      { angle:  0.24, len: 1.20, w: 0.17, base: 0.62 }, // ring
+      { angle:  0.50, len: 1.00, w: 0.15, base: 0.50 }, // pinky
+    ];
+
+    fingerDefs.forEach((f, i) => {
+      const bx = cx + Math.sin(f.angle) * s * f.base;
+      const by = cy - Math.cos(f.angle) * s * f.base * 0.35;
+      const ex = bx + Math.sin(f.angle - 0.1) * s * f.len * 0.6;
+      const ey = by - Math.cos(f.angle - 0.1) * s * f.len * 0.52;
+
+      ctx.fillStyle = isDark ? '#1e293b' : '#dbeafe';
+      ctx.strokeStyle = isDark ? 'rgba(96,165,250,0.5)' : 'rgba(37,99,235,0.4)';
+      ctx.lineWidth = s * f.w;
+      ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(ex, ey); ctx.stroke();
+
+      // Sensor dot at fingertip — pulses
+      const pulse = 0.5 + 0.5 * Math.sin(t * 0.06 + fingerPhases[i]);
+      const dotR = s * 0.10 * (0.7 + 0.3 * pulse);
+      const dotAlpha = 0.4 + 0.6 * pulse;
+      ctx.globalAlpha = dotAlpha;
+      ctx.fillStyle = isDark ? '#60a5fa' : '#2563eb';
+      ctx.beginPath(); ctx.arc(ex, ey, dotR, 0, Math.PI*2); ctx.fill();
+      // Glow ring
+      ctx.globalAlpha = dotAlpha * 0.3;
+      ctx.fillStyle = isDark ? '#93c5fd' : '#3b82f6';
+      ctx.beginPath(); ctx.arc(ex, ey, dotR * 2, 0, Math.PI*2); ctx.fill();
+      ctx.globalAlpha = 1;
+    });
+
+    // IMU chip on back of hand
+    const chipX = cx, chipY = cy + s * 0.18;
+    const chipW = s * 0.5, chipH = s * 0.3;
+    ctx.fillStyle = isDark ? '#0f172a' : '#1e3a5f';
+    ctx.strokeStyle = isDark ? 'rgba(248,196,73,0.8)' : 'rgba(180,120,0,0.8)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.roundRect(chipX - chipW/2, chipY - chipH/2, chipW, chipH, 3); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = isDark ? '#e3b341' : '#92400e';
+    ctx.font = `bold ${Math.max(6, s * 0.18)}px monospace`;
+    ctx.textAlign = 'center';
+    ctx.fillText('MPU6050', chipX, chipY + s*0.06);
+
+    // IMU data text (tiny)
+    const ax = (Math.sin(t * 0.03) * 2.1).toFixed(1);
+    const ay = (Math.cos(t * 0.025) * 1.8).toFixed(1);
+    const gz = (Math.sin(t * 0.04 + 1) * 90).toFixed(0);
+    ctx.fillStyle = isDark ? 'rgba(96,165,250,0.55)' : 'rgba(37,99,235,0.5)';
+    ctx.font = `${Math.max(5, s * 0.13)}px monospace`;
+    ctx.fillText(`ax:${ax} ay:${ay}`, chipX, chipY - s*0.22);
+    ctx.fillText(`gz:${gz}°/s`, chipX, chipY - s*0.08);
+    ctx.textAlign = 'left';
+  }
+
+  function drawESP32(cx, cy, s, t, isDark) {
+    const W = s * 1.0, H = s * 0.6;
+    ctx.fillStyle = isDark ? '#0d2818' : '#064e3b';
+    ctx.strokeStyle = isDark ? 'rgba(74,222,128,0.7)' : 'rgba(5,150,105,0.8)';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.roundRect(cx - W/2, cy - H/2, W, H, 4); ctx.fill(); ctx.stroke();
+
+    // PCB pads left and right
+    for (let i = 0; i < 5; i++) {
+      const py = cy - H/2 + H*0.15 + i * H*0.17;
+      ctx.fillStyle = isDark ? 'rgba(74,222,128,0.5)' : 'rgba(5,150,105,0.6)';
+      ctx.fillRect(cx - W/2 - 4, py, 4, 5);
+      ctx.fillRect(cx + W/2, py, 4, 5);
+    }
+
+    // Label
+    ctx.fillStyle = isDark ? '#4ade80' : '#059669';
+    ctx.font = `bold ${Math.max(7, s*0.2)}px monospace`;
+    ctx.textAlign = 'center';
+    ctx.fillText('ESP32', cx, cy + s*0.07);
+    ctx.font = `${Math.max(5, s*0.14)}px monospace`;
+    ctx.fillStyle = isDark ? 'rgba(74,222,128,0.55)' : 'rgba(5,150,105,0.5)';
+    ctx.fillText('C++ Firmware', cx, cy + s*0.22);
+    ctx.textAlign = 'left';
+
+    // Activity LED blink
+    const ledOn = Math.floor(t * 0.08) % 8 < 2;
+    ctx.fillStyle = ledOn ? '#4ade80' : 'rgba(74,222,128,0.15)';
+    ctx.beginPath(); ctx.arc(cx + W/2 - s*0.12, cy - H/2 + s*0.1, s*0.05, 0, Math.PI*2); ctx.fill();
+  }
+
+  function drawBTWaves(x, y, maxR, t, isDark) {
+    // Bluetooth symbol
+    ctx.fillStyle = isDark ? '#60a5fa' : '#2563eb';
+    ctx.globalAlpha = 0.7;
+    ctx.font = `${Math.max(9, maxR*0.5)}px monospace`;
+    ctx.textAlign = 'center';
+    ctx.fillText('ᛒ', x, y + maxR*0.2);
+    ctx.textAlign = 'left';
+    ctx.globalAlpha = 1;
+
+    // Radiating arcs
+    for (let i = 1; i <= 3; i++) {
+      const phase = (t * 0.025 + i * 0.4) % 1;
+      const r = maxR * 0.3 + phase * maxR * 0.7;
+      const alpha = (1 - phase) * 0.55;
+      ctx.strokeStyle = isDark ? `rgba(96,165,250,${alpha})` : `rgba(37,99,235,${alpha})`;
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(x, y, r, -Math.PI * 0.6, Math.PI * 0.6); ctx.stroke();
+    }
+  }
+
+  function drawHIDTarget(cx, cy, s, t, isDark) {
+    // Monitor/cursor representation
+    // Cursor arrow
+    const cursorX = cx + Math.sin(t * 0.03) * s * 0.2;
+    const cursorY = cy + Math.cos(t * 0.025) * s * 0.15;
+    ctx.fillStyle = isDark ? '#f0f0f0' : '#1a1a1a';
+    ctx.globalAlpha = 0.85;
+    ctx.beginPath();
+    ctx.moveTo(cursorX, cursorY);
+    ctx.lineTo(cursorX, cursorY + s * 0.35);
+    ctx.lineTo(cursorX + s*0.10, cursorY + s*0.26);
+    ctx.lineTo(cursorX + s*0.18, cursorY + s*0.4);
+    ctx.lineTo(cursorX + s*0.23, cursorY + s*0.36);
+    ctx.lineTo(cursorX + s*0.14, cursorY + s*0.22);
+    ctx.lineTo(cursorX + s*0.24, cursorY + s*0.22);
+    ctx.closePath(); ctx.fill();
+    ctx.globalAlpha = 1;
+
+    // HID label
+    ctx.fillStyle = isDark ? 'rgba(240,240,240,0.5)' : 'rgba(0,0,0,0.4)';
+    ctx.font = `${Math.max(6,s*0.18)}px monospace`;
+    ctx.textAlign = 'center';
+    ctx.fillText('HID', cx, cy + s*0.62);
+    ctx.fillStyle = isDark ? 'rgba(240,240,240,0.3)' : 'rgba(0,0,0,0.25)';
+    ctx.font = `${Math.max(5,s*0.13)}px monospace`;
+    ctx.fillText('mouse+kbd', cx, cy + s*0.78);
+    ctx.textAlign = 'left';
+
+    // Click effect
+    const clickPhase = (t * 0.04) % 1;
+    if (clickPhase < 0.15) {
+      ctx.strokeStyle = isDark ? 'rgba(240,240,240,0.4)' : 'rgba(0,0,0,0.3)';
+      ctx.lineWidth = 1;
+      for (let r = 1; r <= 2; r++) {
+        const rr = r * s * 0.12 * (clickPhase / 0.15);
+        ctx.globalAlpha = (1 - clickPhase / 0.15) * 0.5;
+        ctx.beginPath(); ctx.arc(cursorX, cursorY, rr, 0, Math.PI*2); ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  function drawArrow(x1, y1, x2, y2, col, alpha, label, fs) {
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = col; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+    // Arrowhead
+    const angle = Math.atan2(y2 - y1, x2 - x1);
+    const hs = 7;
+    ctx.fillStyle = col;
+    ctx.beginPath();
+    ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - hs * Math.cos(angle - 0.4), y2 - hs * Math.sin(angle - 0.4));
+    ctx.lineTo(x2 - hs * Math.cos(angle + 0.4), y2 - hs * Math.sin(angle + 0.4));
+    ctx.closePath(); ctx.fill();
+    if (label) {
+      ctx.fillStyle = col; ctx.globalAlpha = alpha * 0.7;
+      ctx.font = `${fs || 8}px monospace`;
+      ctx.textAlign = 'center';
+      ctx.fillText(label, (x1+x2)/2, (y1+y2)/2 - 4);
+      ctx.textAlign = 'left';
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // Animated data packet along a line
+  function drawDataPacket(x1, y1, x2, y2, phaseOffset, col) {
+    const p = ((t * 0.012 + phaseOffset) % 1);
+    const px = x1 + (x2-x1)*p, py = y1 + (y2-y1)*p;
+    ctx.fillStyle = col; ctx.globalAlpha = 0.85;
+    ctx.beginPath(); ctx.arc(px, py, 3, 0, Math.PI*2); ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+
   function draw() {
     const W = canvas.width, H = canvas.height;
-    ctx.clearRect(0,0,W,H);
-    const lineCol = getCSSVar('--canvas-line'), dotCol = getCSSVar('--canvas-dot');
-    ctx.strokeStyle=lineCol; ctx.lineWidth=0.5;
-    for(let i=1;i<4;i++){ctx.beginPath();ctx.moveTo(0,H*i/4);ctx.lineTo(W,H*i/4);ctx.stroke();}
-    for(let i=1;i<6;i++){ctx.beginPath();ctx.moveTo(W*i/6,0);ctx.lineTo(W*i/6,H);ctx.stroke();}
-    channels.forEach((ch,ci) => {
-      const baseY = H*(0.25+ci*0.25);
-      ctx.strokeStyle=dotCol; ctx.lineWidth=1.2; ctx.globalAlpha=0.55+ci*0.1;
-      ctx.beginPath();
-      for(let x=0;x<W;x++){
-        const phase=t*ch.freq+ch.phase;
-        const y=baseY-H*ch.amp*Math.sin(x*0.04+phase)-H*ch.amp*0.3*Math.sin(x*0.09+phase*1.3);
-        x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-      }
-      ctx.stroke(); ctx.globalAlpha=1;
+    ctx.clearRect(0, 0, W, H);
+    const isDark = html.dataset.theme === 'dark';
+    const lineCol = getCSSVar('--canvas-line');
+
+    // Layout: glove at 15%, ESP32 at 42%, BT waves at 62%, HID at 82%
+    const s = Math.min(W, H) * 0.32;
+    const midY = H * 0.48;
+
+    const gloveX  = W * 0.14;
+    const esp32X  = W * 0.42;
+    const btX     = W * 0.63;
+    const hidX    = W * 0.82;
+
+    // ── Stage labels at top ──
+    const labelY = H * 0.08;
+    const labelFS = Math.max(7, W * 0.018);
+    ctx.font = `${labelFS}px monospace`;
+
+    const stages = [
+      { x: gloveX,  label: 'GLOVE', col: isDark ? '#60a5fa':'#2563eb' },
+      { x: esp32X,  label: 'ESP32', col: isDark ? '#4ade80':'#059669' },
+      { x: btX,     label: 'BT',    col: isDark ? '#a78bfa':'#7c3aed' },
+      { x: hidX,    label: 'HID',   col: isDark ? '#f0f0f0':'#111' },
+    ];
+    stages.forEach(st => {
+      ctx.fillStyle = st.col; ctx.globalAlpha = 0.55;
+      ctx.textAlign = 'center';
+      ctx.fillText(st.label, st.x, labelY);
+      ctx.globalAlpha = 1;
     });
-    const curX=(t*1.5)%W;
-    const grad=ctx.createLinearGradient(curX-20,0,curX+2,0);
-    grad.addColorStop(0,'transparent'); grad.addColorStop(1,dotCol);
-    ctx.strokeStyle=grad; ctx.lineWidth=1; ctx.globalAlpha=0.5;
-    ctx.beginPath();ctx.moveTo(curX,0);ctx.lineTo(curX,H);ctx.stroke();ctx.globalAlpha=1;
-    [0.16,0.33,0.5,0.66,0.83].forEach(xf=>{[0.25,0.5,0.75].forEach(yf=>{ctx.fillStyle=lineCol;ctx.fillRect(W*xf-1,H*yf-1,2,2);});});
-    t++;requestAnimationFrame(draw);
+    ctx.textAlign = 'left';
+
+    // ── Pipeline arrows with data packets ──
+    const arrowY = midY;
+    const arrowCol = isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)';
+
+    // Glove → ESP32
+    drawArrow(gloveX + s*0.38, arrowY, esp32X - s*0.42, arrowY, arrowCol, 0.8, 'serial', labelFS*0.85);
+    drawDataPacket(gloveX + s*0.38, arrowY, esp32X - s*0.42, arrowY, 0, isDark ? '#60a5fa':'#2563eb');
+
+    // ESP32 → BT
+    drawArrow(esp32X + s*0.42, arrowY, btX - s*0.25, arrowY, arrowCol, 0.8, 'HC-05', labelFS*0.85);
+    drawDataPacket(esp32X + s*0.42, arrowY, btX - s*0.25, arrowY, 0.33, isDark ? '#4ade80':'#059669');
+
+    // BT → HID
+    drawArrow(btX + s*0.25, arrowY, hidX - s*0.30, arrowY, arrowCol, 0.8, 'Python', labelFS*0.85);
+    drawDataPacket(btX + s*0.25, arrowY, hidX - s*0.30, arrowY, 0.66, isDark ? '#a78bfa':'#7c3aed');
+
+    // ── Draw components ──
+    drawGlove(gloveX, midY, s * 0.72, t, isDark);
+    drawESP32(esp32X, midY, s * 0.75, t, isDark);
+    drawBTWaves(btX, midY, s * 0.38, t, isDark);
+    drawHIDTarget(hidX, midY - s*0.15, s * 0.65, t, isDark);
+
+    // 6-axis label under glove
+    ctx.fillStyle = isDark ? 'rgba(96,165,250,0.4)' : 'rgba(37,99,235,0.35)';
+    ctx.font = `${Math.max(6, W*0.016)}px monospace`;
+    ctx.textAlign = 'center';
+    ctx.fillText('6-axis IMU', gloveX, midY + s*0.72);
+    ctx.textAlign = 'left';
+
+    t++; requestAnimationFrame(draw);
   }
   draw();
 }
 
-/* ── ExamCell ── */
+/* ════════════════════════════════════════
+   ExamCell — Google Sheets + Auto-mail UI
+   Shows a styled sheet with student records
+   and a mail-merge panel sending emails
+════════════════════════════════════════ */
 function initExamCell() {
   const canvas = document.getElementById('cv-examcell');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
   resize(); window.addEventListener('resize', resize);
-  function getNodes() {
-    const W=canvas.width,H=canvas.height;
-    return [{x:W*0.08,y:H*0.5},{x:W*0.28,y:H*0.25},{x:W*0.28,y:H*0.75},{x:W*0.55,y:H*0.25},{x:W*0.55,y:H*0.75},{x:W*0.78,y:H*0.5},{x:W*0.95,y:H*0.5}];
+
+  let t = 0;
+  const CYCLE = 280;
+
+  // Fake student data
+  const headers = ['Name', 'Roll No', 'Marks', 'Status', 'Email'];
+  const students = [
+    ['Priya S.',   'CE2301', '87', 'Pass', 'priya@mmcoe'],
+    ['Rahul M.',   'CE2302', '74', 'Pass', 'rahul@mmcoe'],
+    ['Sneha K.',   'CE2303', '55', 'Fail', 'sneha@mmcoe'],
+    ['Arjun P.',   'CE2304', '91', 'Pass', 'arjun@mmcoe'],
+    ['Meera T.',   'CE2305', '62', 'Pass', 'meera@mmcoe'],
+  ];
+
+  function drawSheet(W, H, sendProgress, sentRows) {
+    const isDark = html.dataset.theme === 'dark';
+    // Sheet background
+    ctx.fillStyle = isDark ? '#0d1117' : '#ffffff';
+    ctx.fillRect(0, 0, W, H);
+
+    // Google Sheets-style toolbar strip
+    const toolH = Math.max(18, H * 0.12);
+    ctx.fillStyle = isDark ? '#161b22' : '#f1f3f4';
+    ctx.fillRect(0, 0, W, toolH);
+
+    // Sheets icon (green grid)
+    const ic = toolH * 0.55;
+    ctx.fillStyle = '#0f9d58';
+    ctx.fillRect(6, toolH/2 - ic/2, ic*0.45, ic);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(6, toolH/2, ic*0.45, ic*0.01);
+    ctx.fillRect(6 + ic*0.15, toolH/2 - ic/2, ic*0.01, ic);
+
+    ctx.fillStyle = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)';
+    ctx.font = `${Math.max(7,W*0.022)}px 'Google Sans', sans-serif`;
+    ctx.textAlign = 'left';
+    ctx.fillText('ExamCell_Results.gsheet', 14 + ic, toolH * 0.65);
+
+    // Auto-send trigger badge (top right)
+    const badgeTxt = 'Extensions → Mail Merge';
+    ctx.fillStyle = isDark ? 'rgba(15,157,88,0.2)' : 'rgba(15,157,88,0.12)';
+    ctx.strokeStyle = '#0f9d58';
+    ctx.lineWidth = 0.8;
+    const btw = ctx.measureText(badgeTxt).width + 14;
+    ctx.beginPath();
+    ctx.roundRect(W - btw - 6, toolH/2 - toolH*0.25, btw, toolH*0.5, 3);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#0f9d58';
+    ctx.font = `${Math.max(6,W*0.018)}px monospace`;
+    ctx.fillText(badgeTxt, W - btw - 6 + 7, toolH * 0.67);
+
+    // Column headers
+    const rowH = Math.max(13, (H - toolH) / (students.length + 2.5));
+    const colW = [W*0.22, W*0.14, W*0.12, W*0.14, W*0.34];
+    let startX = W * 0.01;
+
+    const headerY = toolH + rowH;
+    ctx.fillStyle = isDark ? '#21262d' : '#e8f0fe';
+    ctx.fillRect(0, toolH, W, rowH);
+
+    headers.forEach((h, i) => {
+      ctx.fillStyle = isDark ? 'rgba(88,166,255,0.85)' : 'rgba(26,115,232,0.9)';
+      ctx.font = `600 ${Math.max(6,W*0.019)}px monospace`;
+      ctx.textAlign = 'left';
+      let cx = startX;
+      for (let j = 0; j < i; j++) cx += colW[j];
+      ctx.fillText(h, cx + 4, headerY - rowH*0.2);
+    });
+
+    // Grid lines (faint)
+    ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)';
+    ctx.lineWidth = 0.5;
+    for (let r = 0; r <= students.length + 1; r++) {
+      const ry = toolH + rowH * (r + 1);
+      ctx.beginPath(); ctx.moveTo(0, ry); ctx.lineTo(W, ry); ctx.stroke();
+    }
+    let cx2 = startX;
+    colW.forEach(cw => {
+      cx2 += cw;
+      ctx.beginPath(); ctx.moveTo(cx2, toolH); ctx.lineTo(cx2, H); ctx.stroke();
+    });
+
+    // Student rows
+    students.forEach((row, ri) => {
+      const ry = toolH + rowH * (ri + 2);
+      const sent = sentRows.has(ri);
+      const sending = sendProgress !== null && Math.floor(sendProgress * students.length) === ri;
+
+      // Row highlight if sending or sent
+      if (sending) {
+        ctx.fillStyle = isDark ? 'rgba(88,166,255,0.08)' : 'rgba(26,115,232,0.06)';
+        ctx.fillRect(0, ry - rowH, W, rowH);
+      } else if (sent) {
+        ctx.fillStyle = isDark ? 'rgba(15,157,88,0.06)' : 'rgba(15,157,88,0.05)';
+        ctx.fillRect(0, ry - rowH, W, rowH);
+      }
+
+      row.forEach((cell, ci) => {
+        let cx3 = startX;
+        for (let j = 0; j < ci; j++) cx3 += colW[j];
+        let cellCol = isDark ? 'rgba(240,240,240,0.7)' : 'rgba(0,0,0,0.7)';
+        if (ci === 3) { // Status column
+          cellCol = cell === 'Pass'
+            ? (isDark ? '#4ade80' : '#0f9d58')
+            : (isDark ? '#f85149' : '#d93025');
+        }
+        if (ci === 4 && sent) cellCol = isDark ? '#4ade80' : '#0f9d58';
+        ctx.fillStyle = cellCol;
+        ctx.font = `${Math.max(6,W*0.019)}px monospace`;
+        ctx.textAlign = 'left';
+        ctx.fillText(cell, cx3 + 4, ry - rowH*0.22);
+      });
+
+      // Sent checkmark
+      if (sent) {
+        ctx.fillStyle = isDark ? '#4ade80' : '#0f9d58';
+        ctx.font = `${Math.max(7,W*0.022)}px monospace`;
+        ctx.textAlign = 'right';
+        ctx.fillText('✓ sent', W - 6, ry - rowH*0.22);
+        ctx.textAlign = 'left';
+      }
+      // Sending indicator
+      if (sending) {
+        const spin = ['⠋','⠙','⠸','⠴','⠦','⠇'][Math.floor(t * 0.12) % 6];
+        ctx.fillStyle = isDark ? '#58a6ff' : '#1a73e8';
+        ctx.font = `${Math.max(7,W*0.022)}px monospace`;
+        ctx.textAlign = 'right';
+        ctx.fillText(spin + ' sending…', W - 6, ry - rowH*0.22);
+        ctx.textAlign = 'left';
+      }
+    });
+
+    // Bottom status bar
+    const statusY = H - Math.max(12, H*0.09);
+    ctx.fillStyle = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)';
+    ctx.fillRect(0, statusY, W, H - statusY);
+    ctx.fillStyle = isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)';
+    ctx.font = `${Math.max(6,W*0.017)}px monospace`;
+    ctx.textAlign = 'left';
+    const sentCount = sentRows.size;
+    ctx.fillText(`${students.length} rows · ${sentCount} emails sent · Auto-fill from columns`, 6, H - Math.max(4, H*0.035));
   }
-  const edgeIdx=[[0,1],[0,2],[1,3],[2,4],[3,5],[4,5],[5,6]];
-  class FlowParticle {
-    constructor(from,to){this.from=from;this.to=to;this.t=Math.random();this.speed=0.005+Math.random()*0.004;}
-    update(){this.t+=this.speed;if(this.t>1)this.t=0;}
-  }
-  const particles=[];
-  edgeIdx.forEach(([a,b])=>{for(let i=0;i<2;i++)particles.push(new FlowParticle(a,b));});
-  let t=0;
-  function draw(){
-    const W=canvas.width,H=canvas.height;
-    ctx.clearRect(0,0,W,H);
-    const nodes=getNodes();
-    const lineCol=getCSSVar('--canvas-line'),dotCol=getCSSVar('--canvas-dot');
-    edgeIdx.forEach(([a,b])=>{ctx.strokeStyle=lineCol;ctx.lineWidth=0.75;ctx.beginPath();ctx.moveTo(nodes[a].x,nodes[a].y);ctx.lineTo(nodes[b].x,nodes[b].y);ctx.stroke();});
-    particles.forEach(p=>{p.update();const from=nodes[p.from],to=nodes[p.to];const px=from.x+(to.x-from.x)*p.t,py=from.y+(to.y-from.y)*p.t;ctx.fillStyle=dotCol;ctx.globalAlpha=0.75;ctx.beginPath();ctx.arc(px,py,1.8,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;});
-    nodes.forEach((n,i)=>{const pulse=1+0.12*Math.sin(t*0.03+i*0.9);const r=(i===0||i===6?5:4)*pulse;ctx.fillStyle=getCSSVar('--surface2');ctx.strokeStyle=lineCol;ctx.lineWidth=0.75;ctx.beginPath();ctx.arc(n.x,n.y,r,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle=dotCol;ctx.globalAlpha=0.55;ctx.beginPath();ctx.arc(n.x,n.y,1.5,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;});
-    t++;requestAnimationFrame(draw);
+
+  function draw() {
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    const phase = t % CYCLE;
+    // 0-60: show sheet, 60-200: send emails one by one, 200-280: all sent + reset
+    let sendProgress = null;
+    const sentRows = new Set();
+
+    if (phase >= 60 && phase < 200) {
+      sendProgress = (phase - 60) / 140;
+      const sentCount = Math.floor(sendProgress * students.length);
+      for (let i = 0; i < sentCount; i++) sentRows.add(i);
+    } else if (phase >= 200) {
+      for (let i = 0; i < students.length; i++) sentRows.add(i);
+    }
+
+    drawSheet(W, H, sendProgress, sentRows);
+    t++; requestAnimationFrame(draw);
   }
   draw();
 }
